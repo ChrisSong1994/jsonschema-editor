@@ -43,6 +43,7 @@ provideTranslation(translation);
 
 // ── Theme ──
 const { darkMode, toggleDarkMode, preset, setPreset } = useTheme();
+const presetMenuOpen = ref(false);
 
 // ── State ──
 const schema = ref<JSONSchema>(exampleSchema);
@@ -284,6 +285,49 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               ]">
               {{ lang.label }}
             </button>
+          </div>
+          <!-- Global theme switcher (dark mode + brand-color preset) -->
+          <div class="flex items-center gap-2 rounded-lg border border-border bg-card p-0.5 shadow-sm">
+            <button type="button" @click="toggleDarkMode()"
+              :title="t.darkMode"
+              :aria-label="t.darkMode"
+              :class="[
+                'flex items-center justify-center h-7 w-7 rounded-md transition-colors',
+                darkMode
+                  ? 'text-yellow-300 hover:bg-muted'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              ]">
+              <Sun v-if="!darkMode" :size="15" />
+              <Moon v-else :size="15" />
+            </button>
+            <div class="relative">
+              <button type="button" @click="presetMenuOpen = !presetMenuOpen"
+                :title="t.colorPreset"
+                :aria-label="t.colorPreset"
+                :style="{ background: THEME_PRESETS[preset].primary }"
+                class="flex items-center gap-1.5 h-7 pl-2 pr-1.5 rounded-md text-white transition-opacity hover:opacity-90">
+                <span :style="{ background: THEME_PRESETS[preset].primary }"
+                  class="inline-block h-3 w-3 rounded-full border border-white/40" />
+                <ChevronDown :size="13" />
+              </button>
+              <div v-if="presetMenuOpen"
+                class="absolute right-0 top-full mt-2 z-40 w-40 rounded-lg border border-border bg-popover shadow-xl p-1.5">
+                <p class="px-2 py-1 text-[11px] text-muted-foreground uppercase tracking-wider font-medium">{{ t.colorPreset }}</p>
+                <button v-for="key in THEME_PRESET_KEYS" :key="key" type="button"
+                  @click="setPreset(key as ThemePreset); presetMenuOpen = false"
+                  :class="[
+                    'flex w-full items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors',
+                    preset === key ? 'bg-primary-50 text-primary-700' : 'text-foreground hover:bg-muted'
+                  ]">
+                  <span class="inline-block h-3.5 w-3.5 rounded-full"
+                    :style="{ background: THEME_PRESETS[key as ThemePreset].primary }" />
+                  {{ t[key as keyof DemoText] }}
+                  <span v-if="preset === key" class="ml-auto text-primary-600">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
