@@ -50,7 +50,7 @@ const maxItemsId = useId();
 const uniqueItemsId = useId();
 
 const itemsSchema = computed(
-  () => getArrayItemsSchema(props.schema) || { type: "string" },
+  () => getArrayItemsSchema(props.schema) || { type: "string" as const },
 );
 
 const itemType = computed(() =>

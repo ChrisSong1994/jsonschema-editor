@@ -20,7 +20,10 @@ const t = useTranslation();
 
 const parentSchema = computed(() => {
   if (props.path.length === 0) return store.schema.value;
-  return store.getAtPath(props.path) ?? { type: "object", properties: {} };
+  return (
+    store.getAtPath(props.path) ??
+    ({ type: "object", properties: {} } as ObjectJSONSchema)
+  );
 });
 
 const properties = computed(() => getSchemaProperties(parentSchema.value));

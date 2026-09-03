@@ -35,7 +35,7 @@
     "dev": "pnpm -C example dev",
     "preview": "pnpm -C example preview",
     "build": "vite build",
-    "build:demo": "pnpm -C example build",
+    "build:example": "pnpm -C example build",
     "lint": "biome lint .",
     "format": "biome format . --write",
     "check": "biome check .",

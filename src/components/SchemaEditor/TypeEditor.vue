@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useTranslation } from "../../hooks/use-translation.ts";
 import type {
   JSONSchema,
   ObjectJSONSchema,
@@ -29,8 +28,6 @@ const props = withDefaults(
 const emit = defineEmits<{
   change: [schema: ObjectJSONSchema];
 }>();
-
-const t = useTranslation();
 
 const getType = () =>
   withObjectSchema(

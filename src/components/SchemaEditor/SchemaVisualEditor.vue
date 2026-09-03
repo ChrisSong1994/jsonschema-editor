@@ -2,12 +2,11 @@
 import { computed } from "vue";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { useSchemaStore } from "../../hooks/useSchemaStore.ts";
-import type { NewField } from "../../types/jsonSchema.ts";
 import { isBooleanSchema, isObjectSchema } from "../../types/jsonSchema.ts";
 import AddFieldButton from "./AddFieldButton.vue";
 import SchemaFieldList from "./SchemaFieldList.vue";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     readOnly?: boolean;
   }>(),
