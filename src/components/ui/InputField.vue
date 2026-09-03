@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import InputText from "primevue/inputtext";
+import ElInput from "element-plus/es/components/input/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/input/style/css";
 
-const model = defineModel<string>();
-
-defineProps<{
+const props = defineProps<{
   id?: string;
   type?: string;
   placeholder?: string;
@@ -15,6 +15,8 @@ defineProps<{
   autofocus?: boolean;
 }>();
 
+const model = defineModel<string>();
+
 const emit = defineEmits<{
   blur: [event: FocusEvent];
   keydown: [event: KeyboardEvent];
@@ -23,20 +25,20 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <InputText
+  <ElInput
     v-model="model"
-    :id="id"
-    :type="type"
-    :placeholder="placeholder"
-    :disabled="disabled"
-    :class="$props.class"
-    :min="min"
-    :step="step"
-    :required="required"
-    :autofocus="autofocus"
+    :id="props.id"
+    :type="props.type"
+    :placeholder="props.placeholder"
+    :disabled="props.disabled"
+    :class="props.class"
+    :min="props.min"
+    :step="props.step"
+    :required="props.required"
+    :autofocus="props.autofocus"
     @blur="emit('blur', $event)"
-    @keydown="emit('keydown', $event)"
+    @keydown="emit('keydown', $event as KeyboardEvent)"
     @focus="emit('focus', $event)"
-    fluid
+    class="w-full"
   />
 </template>

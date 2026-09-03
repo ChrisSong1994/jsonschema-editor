@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import PSelect from "primevue/select";
+import {
+  ElOption,
+  ElSelect,
+} from "element-plus/es/components/select/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/select/style/css";
 import { computed } from "vue";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { getTypeColor, getTypeLabel } from "../../lib/utils.ts";
@@ -37,41 +42,35 @@ const options = computed(() =>
   })),
 );
 
+const value = computed<string>({
+  get: () => props.modelValue,
+  set: (v: string) => emit("update:modelValue", v as SchemaType),
+});
+
 const selectedOption = computed(() =>
   options.value.find((o) => o.value === props.modelValue),
 );
-
-const handleChange = (event: { value: string }) => {
-  emit("update:modelValue", event.value as SchemaType);
-};
 </script>
 
 <template>
-  <PSelect
-    :modelValue="modelValue"
-    @change="handleChange"
-    :options="options"
-    optionLabel="label"
-    optionValue="value"
-    :disabled="readOnly"
-    appendTo="body"
-    :class="['text-xs', $props.class]"
-    :pt="{
-      root: { style: 'min-width: 92px; padding: 0.25rem 0.5rem; font-size: 0.75rem;' },
-      label: { style: 'padding: 0.25rem 0; font-size: 0.75rem; font-weight: 500;', class: selectedOption?.color },
-      option: { style: 'font-size: 0.75rem; padding: 0.375rem 0.75rem;' },
-      overlay: { class: 'jscb' },
-    }"
+  <ElSelect
+    v-model="value"
+    :disabled="props.readOnly"
+    :class="['text-xs font-medium', props.class]"
+    class="w-[110px]"
+    popper-class="jscb"
   >
-    <template #option="{ option }">
-      <span :class="['px-2 py-0.5 rounded text-xs font-medium', option.color]">
-        {{ option.label }}
+    <template #prefix v-if="selectedOption">
+      <span :class="['text-xs font-medium', selectedOption.color]">
+        {{ selectedOption.label }}
       </span>
     </template>
-    <template #value="{ value: val }">
-      <span v-if="val" :class="['text-xs font-medium', getTypeColor(val as SchemaType)]">
-        {{ getTypeLabel(t, val as SchemaType) }}
-      </span>
-    </template>
-  </PSelect>
+    <ElOption
+      v-for="opt in options"
+      :key="opt.value"
+      :label="opt.label"
+      :value="opt.value"
+      :class="['text-xs font-medium', opt.color]"
+    />
+  </ElSelect>
 </template>

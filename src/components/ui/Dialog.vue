@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import PDialog from "primevue/dialog";
+import ElDialog from "element-plus/es/components/dialog/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/dialog/style/css";
 
 const props = withDefaults(
   defineProps<{
@@ -17,22 +19,20 @@ const emit = defineEmits<{
 </script>
 
 <template>
-	<PDialog
-		:visible="props.visible"
-		:header="props.header"
-		:modal="props.modal"
-		:closable="true"
-		:class="props.class"
-		appendTo="body"
-		:pt="{ mask: { class: 'jscb' } }"
-		@update:visible="emit('update:visible', $event)"
-	>
-		<template v-if="$slots.header" #header>
-			<slot name="header" />
-		</template>
-		<slot />
-		<template v-if="$slots.footer" #footer>
-			<slot name="footer" />
-		</template>
-	</PDialog>
+  <ElDialog
+    :model-value="props.visible"
+    :title="props.header"
+    :modal="props.modal"
+    :class="props.class"
+    class="jsonschema-dialog"
+    @update:model-value="emit('update:visible', $event)"
+  >
+    <template v-if="$slots.header" #header>
+      <slot name="header" />
+    </template>
+    <slot />
+    <template v-if="$slots.footer" #footer>
+      <slot name="footer" />
+    </template>
+  </ElDialog>
 </template>

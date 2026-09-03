@@ -76,7 +76,7 @@ const handleInfer = () => {
     v-if="isDialog"
     :visible="props.visible ?? false"
     @update:visible="emit('update:visible', $event)"
-    class="md:max-w-[700px] max-h-[80vh] w-[95vw] jscb"
+    class="md:max-w-[700px]! max-h-[80vh]! w-[95vw]! jscb"
   >
     <template #header>
       <div class="mb-2">

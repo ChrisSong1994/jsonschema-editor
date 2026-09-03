@@ -5,6 +5,21 @@ import dts from "vite-plugin-dts";
 
 const isDemo = process.env.BUILD_MODE === "demo";
 
+const isExternalModule = (id: string): boolean =>
+  [
+    "vue",
+    "monaco-editor",
+    "element-plus",
+    /^monaco-editor\//,
+  ].some((entry) =>
+    typeof entry === "string" ? entry === id : entry.test(id),
+  ) ||
+  // Element Plus JS modules stay external, but style entry points are
+  // bundled so EP component CSS lands in dist/index.css
+  (/^element-plus\//.test(id) &&
+    !/\/style\//.test(id) &&
+    !/theme-chalk/.test(id));
+
 export default defineConfig(
   isDemo
     ? {
@@ -50,15 +65,7 @@ export default defineConfig(
             fileName: "index",
           },
           rollupOptions: {
-            external: [
-              "vue",
-              "primevue",
-              /^primevue\//,
-              /^@primevue\//,
-              /^@primeuix\//,
-              "monaco-editor",
-              /^monaco-editor\//,
-            ],
+            external: (id: string) => isExternalModule(id),
           },
           cssCodeSplit: false,
           copyPublicDir: false,

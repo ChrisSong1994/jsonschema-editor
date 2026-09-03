@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import Chip from "primevue/chip";
-import InputNumber from "primevue/inputnumber";
+import {
+  ElInputNumber,
+} from "element-plus/es/components/input-number/index";
+import { ElTag } from "element-plus/es/components/tag/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/input-number/style/css";
+import "element-plus/es/components/tag/style/css";
 import { computed, ref, useId } from "vue";
 import Button from "../../../components/ui/Button.vue";
 import InputField from "../../../components/ui/InputField.vue";
@@ -163,36 +168,32 @@ const needsDetail = computed(
         <label :for="minLengthId" :class="['text-sm font-medium', (!!minMaxError || !!minLengthError) && 'text-red-500']">
           {{ t.stringMinimumLengthLabel }}
         </label>
-        <InputNumber
-          :inputId="minLengthId"
+        <ElInputNumber
+          :id="minLengthId"
           :modelValue="minLengthValue"
           @update:modelValue="(v: number | null) => handleValidationChange('minLength', v ?? undefined)"
           :placeholder="t.stringMinimumLengthPlaceholder"
           :min="0"
           :disabled="readOnly"
-          :invalid="!!minMaxError || !!minLengthError"
-          fluid
-          size="small"
-          showButtons
-        />
+          
+                    size="small"
+                  />
       </div>
 
       <div v-if="!readOnly || maxLengthValue !== null" class="flex flex-col gap-2">
         <label :for="maxLengthId" :class="['text-sm font-medium', (!!minMaxError || !!maxLengthError) && 'text-red-500']">
           {{ t.stringMaximumLengthLabel }}
         </label>
-        <InputNumber
-          :inputId="maxLengthId"
+        <ElInputNumber
+          :id="maxLengthId"
           :modelValue="maxLengthValue"
           @update:modelValue="(v: number | null) => handleValidationChange('maxLength', v ?? undefined)"
           :placeholder="t.stringMaximumLengthPlaceholder"
           :min="0"
           :disabled="readOnly"
-          :invalid="!!minMaxError || !!maxLengthError"
-          fluid
-          size="small"
-          showButtons
-        />
+          
+                    size="small"
+                  />
       </div>
 
       <div v-if="!!minMaxError || !!minLengthError || !!maxLengthError" class="text-xs text-red-500 italic md:col-span-2 whitespace-pre-line">
@@ -231,13 +232,15 @@ const needsDetail = computed(
 
       <div class="flex flex-wrap gap-2 mb-4">
         <template v-if="enumValues.length > 0">
-          <Chip
+          <ElTag
             v-for="value in enumValues"
             :key="`enum-string-${value}`"
-            :label="String(value)"
-            removable
-            @remove="handleRemoveEnumValue(enumValues.indexOf(value))"
-          />
+            closable
+            @close="handleRemoveEnumValue(enumValues.indexOf(value))"
+            class="text-xs"
+          >
+            {{ value }}
+          </ElTag>
         </template>
         <p v-else class="text-xs italic" style="color: var(--p-text-muted-color);">
           {{ t.stringAllowedValuesEnumNone }}
@@ -256,8 +259,8 @@ const needsDetail = computed(
         <Button
           type="button"
           @click="handleAddEnumValue()"
-          size="small"
-          severity="secondary"
+          size="sm"
+          variant="secondary"
         >
           {{ t.stringAllowedValuesEnumAddLabel }}
         </Button>

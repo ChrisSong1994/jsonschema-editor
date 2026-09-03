@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import PButton from "primevue/button";
+import ElButton from "element-plus/es/components/button/index";
+import "element-plus/es/components/button/style/css";
+import { computed } from "vue";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     variant?:
       | "default"
@@ -19,24 +21,24 @@ withDefaults(
 const emit = defineEmits<{
   click: [event: MouseEvent];
 }>();
+
+const elType = computed(() => {
+  if (props.variant === "destructive") return "danger";
+  if (props.variant === "secondary") return undefined;
+  return "primary";
+});
 </script>
 
 <template>
-  <PButton
-    :type="type"
-    :severity="
-      variant === 'destructive'
-        ? 'danger'
-        : variant === 'secondary'
-          ? 'secondary'
-          : undefined
-    "
-    :outlined="variant === 'outline'"
-    :text="variant === 'ghost' || variant === 'link'"
+  <ElButton
+    :type="elType"
+    :plain="variant === 'outline'"
+    :text="variant === 'ghost'"
     :link="variant === 'link'"
-    :size="size === 'sm' ? 'small' : size === 'lg' ? 'large' : undefined"
+    :size="size === 'sm' ? 'small' : size === 'lg' ? 'large' : 'default'"
+    :native-type="type"
     @click="emit('click', $event)"
   >
     <slot />
-  </PButton>
+  </ElButton>
 </template>

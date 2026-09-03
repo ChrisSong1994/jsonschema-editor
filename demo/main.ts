@@ -9,11 +9,8 @@ import JsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
   },
 };
 
-import PrimeVue from "primevue/config";
-import Tooltip from "primevue/tooltip";
 import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
-import { auraPreset } from "../src/themes/presets.ts";
 import App from "./App.vue";
 import "./index.css";
 
@@ -34,22 +31,5 @@ const router = createRouter({
 });
 
 const app = createApp(App);
-app.use(PrimeVue, {
-  theme: {
-    preset: auraPreset,
-    options: {
-      darkModeSelector: ".jscb-dark",
-    },
-  },
-  pt: {
-    select: {
-      overlay: { class: "jscb" },
-    },
-    dialog: {
-      mask: { class: "jscb" },
-    },
-  },
-});
-app.directive("tooltip", Tooltip);
 app.use(router);
 app.mount("#app");

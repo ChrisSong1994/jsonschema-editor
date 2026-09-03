@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import PrimeVue from "primevue/config";
+import ElementPlus from "element-plus";
 import { describe, expect, it } from "vitest";
 import Badge from "../src/components/ui/Badge.vue";
 import Button from "../src/components/ui/Button.vue";
@@ -8,7 +8,7 @@ import Label from "../src/components/ui/Label.vue";
 
 const globalPlugins = {
   global: {
-    plugins: [PrimeVue],
+    plugins: [ElementPlus],
   },
 };
 

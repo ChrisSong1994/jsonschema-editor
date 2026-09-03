@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import PrimeVue from "primevue/config";
+import ElementPlus from "element-plus";
 import { describe, expect, it } from "vitest";
 import InputField from "../src/components/ui/InputField.vue";
 import Select from "../src/components/ui/Select.vue";
@@ -7,7 +7,7 @@ import Switch from "../src/components/ui/Switch.vue";
 
 const globalPlugins = {
   global: {
-    plugins: [PrimeVue],
+    plugins: [ElementPlus],
   },
 };
 
@@ -22,11 +22,12 @@ describe("InputField", () => {
     );
   });
 
-  it("renders with id", () => {
+  it("renders with id", async () => {
     const wrapper = mount(InputField, {
       ...globalPlugins,
       props: { id: "test-input" },
     });
+    await new Promise((r) => setTimeout(r, 0));
     expect(wrapper.find("input").attributes("id")).toBe("test-input");
   });
 

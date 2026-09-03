@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import ToggleSwitch from "primevue/toggleswitch";
+import ElSwitch from "element-plus/es/components/switch/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/switch/style/css";
 
-const model = defineModel<boolean>();
-
-defineProps<{
+const props = defineProps<{
   id?: string;
   disabled?: boolean;
 }>();
+
+const model = defineModel<boolean>();
 </script>
 
 <template>
-  <ToggleSwitch v-model="model" :inputId="id" :disabled="disabled" />
+  <ElSwitch
+    v-model="model"
+    :id="props.id"
+    :disabled="props.disabled"
+  />
 </template>

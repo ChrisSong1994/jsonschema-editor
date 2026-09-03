@@ -45,7 +45,8 @@ const en = {
   validatorEventUpdateVisible: "Dialog open/close.",
 
   basicTitle: "Basic Usage",
-  basicDesc: "The default configuration with both visual and JSON editor panels.",
+  basicDesc:
+    "The default configuration with both visual and JSON editor panels.",
   visualOnlyTitle: "Visual Only",
   visualOnlyDesc:
     "Hide the JSON code panel — ideal for end-users who only need the visual builder.",
@@ -64,8 +65,7 @@ const en = {
   inlineTitle: "Inline Mode",
   omitVisibleA: "Omit",
   omitVisibleB: "to render inline.",
-  inferInlineExtra:
-    "Here the inferred schema feeds a separate editor below.",
+  inferInlineExtra: "Here the inferred schema feeds a separate editor below.",
   stepPasteJson: "1 — Paste JSON",
   stepResultSchema: "2 — Resulting schema",
   utilityTitle: "Utility Function",
@@ -93,8 +93,7 @@ const en = {
   availableLocales: "Available Locales",
 
   themingDesc:
-    "Switch between built-in PrimeVue presets at runtime and toggle dark mode. The useTheme composable provides reactive state for the active preset and dark mode.",
-  preset: "Preset",
+    "Toggle dark mode at runtime. The useTheme composable provides reactive dark-mode state.",
   darkMode: "Dark Mode",
   dark: "Dark",
   light: "Light",
@@ -196,9 +195,7 @@ const zh: DemoText = {
     "所有组件通过 Vue 的 provide / inject 共享响应式翻译上下文。提供一个 Ref<Translation> 并在运行时修改它的值，即可切换语言。",
   availableLocales: "可用语言",
 
-  themingDesc:
-    "运行时切换内置 PrimeVue 预设并开关深色模式。useTheme 组合式函数提供当前预设与深色模式的响应式状态。",
-  preset: "预设",
+  themingDesc: "运行时开关深色模式。useTheme 组合式函数提供响应式的深色模式状态。",
   darkMode: "深色模式",
   dark: "深色",
   light: "浅色",

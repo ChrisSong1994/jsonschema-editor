@@ -1,6 +1,5 @@
 import { mount } from "@vue/test-utils";
-import PrimeVue from "primevue/config";
-import Tooltip from "primevue/tooltip";
+import ElementPlus from "element-plus";
 import { describe, expect, it } from "vitest";
 import AddFieldButton from "../src/components/SchemaEditor/AddFieldButton.vue";
 import SchemaFieldList from "../src/components/SchemaEditor/SchemaFieldList.vue";
@@ -22,8 +21,7 @@ function mountWithStore(component: any, options: any = {}) {
     ...options,
     global: {
       ...(options.global || {}),
-      plugins: [...(options.global?.plugins || []), PrimeVue],
-      directives: { tooltip: Tooltip },
+      plugins: [...(options.global?.plugins || []), ElementPlus],
       provide: {
         ...(options.global?.provide || {}),
         [TranslationKey as symbol]: en,
@@ -92,8 +90,7 @@ describe("SchemaVisualEditor", () => {
       const wrapper = mount(SchemaVisualEditor, {
         props: { readOnly: false },
         global: {
-          plugins: [PrimeVue],
-          directives: { tooltip: Tooltip },
+          plugins: [ElementPlus],
           provide: {
             [TranslationKey as symbol]: en,
             [SchemaStoreKey as symbol]: store,

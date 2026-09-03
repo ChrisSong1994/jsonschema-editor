@@ -1,14 +1,12 @@
 <script setup lang="ts">
+import { ElTabPane, ElTabs } from "element-plus/es/components/tabs/index";
+import "element-plus/es/components/tabs/style/css";
 import hljs from "highlight.js/lib/core";
 import typescript from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import { Check, Clipboard, Code2, Eye } from "lucide-vue-next";
-import Tab from "primevue/tab";
-import TabList from "primevue/tablist";
-import TabPanel from "primevue/tabpanel";
-import TabPanels from "primevue/tabpanels";
-import Tabs from "primevue/tabs";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { demoText } from "../utils/demoI18n.ts";
 import "highlight.js/styles/github.min.css";
 
 hljs.registerLanguage("xml", xml);
@@ -25,6 +23,7 @@ const props = withDefaults(
 const copiedId = ref(false);
 const resultEl = ref<HTMLElement | null>(null);
 const cachedHeight = ref(400);
+const activeTab = ref("result");
 
 // Track result panel height with ResizeObserver
 let observer: ResizeObserver | null = null;
@@ -72,64 +71,37 @@ const copyCode = () => {
 
 <template>
   <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
-    <Tabs value="result">
-      <div class="flex items-center justify-between border-b border-border/30 bg-gray-50/60">
-        <TabList
-          :pt="{
-            root: { style: 'border: none; background: transparent; padding: 0 0.5rem;' },
-            tabs: { style: 'background: transparent;' },
-          }"
-        >
-          <Tab
-            value="result"
-            :pt="{
-              root: { style: 'padding: 0.625rem 0.875rem; font-size: 0.8125rem; font-weight: 600;' },
-            }"
-          >
-            <div class="flex items-center gap-1.5">
-              <Eye :size="13" />
-              Result
-            </div>
-          </Tab>
-          <Tab
-            value="code"
-            :pt="{
-              root: { style: 'padding: 0.625rem 0.875rem; font-size: 0.8125rem; font-weight: 600;' },
-            }"
-          >
-            <div class="flex items-center gap-1.5">
-              <Code2 :size="13" />
-              Code
-            </div>
-          </Tab>
-        </TabList>
-
-        <button
-          type="button"
-          @click="copyCode"
-          class="mr-3 text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
-        >
-          <Check v-if="copiedId" :size="12" class="text-green-500" />
-          <Clipboard v-else :size="12" />
-          Copy
-        </button>
-      </div>
-
-      <TabPanels>
-        <TabPanel value="result">
+    <div class="relative">
+      <button
+        type="button"
+        @click="copyCode"
+        class="absolute right-3 top-2 z-10 text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
+      >
+        <Check v-if="copiedId" :size="12" class="text-green-500" />
+        <Clipboard v-else :size="12" />
+        {{ demoText.copy }}
+      </button>
+      <ElTabs v-model="activeTab" class="w-full">
+        <ElTabPane name="result" class="!p-0">
+          <template #label>
+            <span class="flex items-center gap-1.5"><Eye :size="13" /> {{ demoText.resultTab }}</span>
+          </template>
           <div ref="resultEl">
             <slot />
           </div>
-        </TabPanel>
-        <TabPanel value="code">
+        </ElTabPane>
+        <ElTabPane name="code" class="!p-0">
+          <template #label>
+            <span class="flex items-center gap-1.5"><Code2 :size="13" /> {{ demoText.codeTab }}</span>
+          </template>
           <div
             class="overflow-auto bg-[#f6f8fa]"
             :style="{ height: cachedHeight + 'px' }"
           >
             <pre class="px-5 py-4 text-[13px] leading-relaxed"><code class="hljs" v-html="highlightedCode" /></pre>
           </div>
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+        </ElTabPane>
+      </ElTabs>
+    </div>
   </div>
 </template>

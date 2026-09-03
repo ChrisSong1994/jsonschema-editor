@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import PrimeVue from "primevue/config";
+import ElementPlus from "element-plus";
 import { describe, expect, it } from "vitest";
 import BooleanEditor from "../src/components/SchemaEditor/types/BooleanEditor.vue";
 import NumberEditor from "../src/components/SchemaEditor/types/NumberEditor.vue";
@@ -13,7 +13,7 @@ function mountWithTranslation(component: any, options: any = {}) {
     ...options,
     global: {
       ...(options.global || {}),
-      plugins: [...(options.global?.plugins || []), PrimeVue],
+      plugins: [...(options.global?.plugins || []), ElementPlus],
       provide: {
         ...(options.global?.provide || {}),
         [TranslationKey as symbol]: en,
@@ -143,8 +143,8 @@ describe("NumberEditor", () => {
     const wrapper = mountWithTranslation(NumberEditor, {
       props: { schema, integer: true },
     });
-    // PrimeVue InputNumber renders with data-pc-name="inputnumber"
-    const inputNumbers = wrapper.findAll("[data-pc-name='inputnumber']");
+    // Element Plus InputNumber renders with the el-input-number class
+    const inputNumbers = wrapper.findAll(".el-input-number");
     expect(inputNumbers.length).toBeGreaterThan(0);
   });
 });

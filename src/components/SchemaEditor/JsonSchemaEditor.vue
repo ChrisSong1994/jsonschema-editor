@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Maximize2 } from "lucide-vue-next";
-import TabPanel from "primevue/tabpanel";
 import { ref, watch } from "vue";
 import Tabs from "../../components/ui/Tabs.vue";
 import { useTranslation } from "../../hooks/use-translation.ts";
@@ -152,6 +151,18 @@ const handleMouseUp = () => {
     <template v-else>
       <!-- For mobile screens - show as tabs -->
       <div class="block lg:hidden w-full">
+        <div class="flex items-center justify-between px-4 py-3 border-b w-full">
+          <h3 class="font-medium">{{ t.schemaEditorTitle }}</h3>
+          <button
+            v-if="showFullscreen"
+            type="button"
+            @click="toggleFullscreen"
+            class="p-1.5 rounded-md hover:bg-secondary transition-colors"
+            :aria-label="t.schemaEditorToggleFullscreen"
+          >
+            <Maximize2 :size="16" />
+          </button>
+        </div>
         <Tabs
           v-model="activeTab"
           :tabs="[
@@ -160,26 +171,17 @@ const handleMouseUp = () => {
           ]"
           class="w-full"
         >
-          <div class="flex items-center justify-between px-4 py-3 border-b w-full">
-            <h3 class="font-medium">{{ t.schemaEditorTitle }}</h3>
-            <button
-              v-if="showFullscreen"
-              type="button"
-              @click="toggleFullscreen"
-              class="p-1.5 rounded-md hover:bg-secondary transition-colors"
-              :aria-label="t.schemaEditorToggleFullscreen"
-            >
-              <Maximize2 :size="16" />
-            </button>
-          </div>
+          <template #visual>
+            <div :class="cn('focus:outline-hidden w-full', isFullscreen ? 'h-screen' : 'h-[500px]')">
+              <SchemaVisualEditor :read-only="readOnly" />
+            </div>
+          </template>
 
-          <TabPanel value="visual" :class="cn('focus:outline-hidden w-full', isFullscreen ? 'h-screen' : 'h-[500px]')">
-            <SchemaVisualEditor :read-only="readOnly" />
-          </TabPanel>
-
-          <TabPanel value="json" :class="cn('focus:outline-hidden w-full', isFullscreen ? 'h-screen' : 'h-[500px]')">
-            <JsonSchemaVisualizer />
-          </TabPanel>
+          <template #json>
+            <div :class="cn('focus:outline-hidden w-full', isFullscreen ? 'h-screen' : 'h-[500px]')">
+              <JsonSchemaVisualizer />
+            </div>
+          </template>
         </Tabs>
       </div>
 

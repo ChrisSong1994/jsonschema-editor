@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import PrimeVue from "primevue/config";
+import ElementPlus from "element-plus";
 import { describe, expect, it } from "vitest";
 import SchemaTypeSelector from "../src/components/SchemaEditor/SchemaTypeSelector.vue";
 import TypeDropdown from "../src/components/SchemaEditor/TypeDropdown.vue";
@@ -11,7 +11,7 @@ function mountWithTranslation(component: any, options: any = {}) {
     ...options,
     global: {
       ...(options.global || {}),
-      plugins: [...(options.global?.plugins || []), PrimeVue],
+      plugins: [...(options.global?.plugins || []), ElementPlus],
       provide: {
         ...(options.global?.provide || {}),
         [TranslationKey as symbol]: en,
@@ -78,14 +78,13 @@ describe("TypeDropdown", () => {
       props: { modelValue: "object", readOnly: true },
     });
     expect(wrapper.text()).toContain(en.schemaTypeObject);
-    // PrimeVue Select renders with aria-disabled or p-disabled class when disabled
-    const selectEl = wrapper.find("[data-pc-name='select']");
+    // Element Plus Select renders as an input with the is-disabled class
+    const selectEl = wrapper.find(".el-select");
     expect(selectEl.exists()).toBe(true);
-    // Check that the component is disabled via HTML attribute or PrimeVue class
-    expect(
-      selectEl.attributes("aria-disabled") === "true" ||
-        selectEl.classes().some((c) => c.includes("disabled")),
-    ).toBe(true);
+    // The underlying select input should be disabled
+    expect(selectEl.find("input").attributes("disabled") !== undefined).toBe(
+      true,
+    );
   });
 
   it("renders with correct type color classes", () => {

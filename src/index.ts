@@ -22,15 +22,7 @@ export type { Translation } from "./i18n/translation-keys.ts";
 // Utilities
 export { createSchemaFromJson, inferSchema } from "./lib/schema-inference.ts";
 // Themes
-export {
-  auraPreset,
-  laraPreset,
-  materialPreset,
-  noraPreset,
-  type PresetName,
-  presets,
-  useTheme,
-} from "./themes/index.ts";
+export { useTheme } from "./themes/index.ts";
 // Types
 export type {
   JSONSchema,

@@ -261,27 +261,10 @@ import type { JSONSchema } from "@fett/jsonschema-editor"
 
 const schema = ref<JSONSchema>({ type: "object", properties: {} })
 
-const {
-  currentPreset,
-  darkMode,
-  switchPreset,
-  toggleDarkMode,
-  presetNames,
-} = useTheme()
+const { darkMode, toggleDarkMode } = useTheme()
 ${ES}
 
 <template>
-  <div class="flex gap-2 mb-4">
-    <button
-      v-for="name in presetNames"
-      :key="name"
-      @click="switchPreset(name)"
-      :class="{ 'font-bold': currentPreset === name }"
-    >
-      {{ name }}
-    </button>
-  </div>
-
   <button @click="toggleDarkMode()">
     {{ darkMode ? '☀️ Light' : '🌙 Dark' }}
   </button>

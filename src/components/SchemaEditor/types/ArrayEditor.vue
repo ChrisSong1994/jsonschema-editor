@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import InputNumber from "primevue/inputnumber";
+import {
+  ElInputNumber,
+} from "element-plus/es/components/input-number/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/input-number/style/css";
 import { computed, ref, useId } from "vue";
 import Label from "../../../components/ui/Label.vue";
 import Switch from "../../../components/ui/Switch.vue";
@@ -138,37 +142,33 @@ const maxItemsError = computed(
         <label :for="minItemsId" :class="['text-sm font-medium', (!!minMaxError || !!minItemsError) && 'text-red-500']">
           {{ t.arrayMinimumLabel }}
         </label>
-        <InputNumber
-          :inputId="minItemsId"
+        <ElInputNumber
+          :id="minItemsId"
           :modelValue="minItems"
           @update:modelValue="(v: number | null) => { minItems = v; }"
           @blur="handleValidationChange()"
           :placeholder="t.arrayMinimumPlaceholder"
           :min="0"
-          :invalid="!!minMaxError || !!minItemsError"
+          
           :disabled="readOnly"
-          fluid
-          size="small"
-          showButtons
-        />
+                    size="small"
+                  />
       </div>
       <div v-if="!readOnly || !!maxItems" class="flex flex-col gap-2">
         <label :for="maxItemsId" :class="['text-sm font-medium', (!!minMaxError || !!maxItemsError) && 'text-red-500']">
           {{ t.arrayMaximumLabel }}
         </label>
-        <InputNumber
-          :inputId="maxItemsId"
+        <ElInputNumber
+          :id="maxItemsId"
           :modelValue="maxItems"
           @update:modelValue="(v: number | null) => { maxItems = v; }"
           @blur="handleValidationChange()"
           :placeholder="t.arrayMaximumPlaceholder"
           :min="0"
-          :invalid="!!minMaxError || !!maxItemsError"
+          
           :disabled="readOnly"
-          fluid
-          size="small"
-          showButtons
-        />
+                    size="small"
+                  />
       </div>
       <div v-if="!!minMaxError || !!minItemsError || !!maxItemsError" class="text-xs text-red-500 italic md:col-span-2 whitespace-pre-line">
         {{ [minMaxError, minItemsError ?? maxItemsError].filter(Boolean).join("\n") }}

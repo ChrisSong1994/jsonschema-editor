@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import Tag from "primevue/tag";
+import ElTag from "element-plus/es/components/tag/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/tag/style/css";
 import { computed } from "vue";
 
 const props = withDefaults(
@@ -9,22 +11,22 @@ const props = withDefaults(
   { variant: "default" },
 );
 
-const severity = computed(() => {
+const type = computed(() => {
   switch (props.variant) {
     case "destructive":
       return "danger";
     case "secondary":
-      return "secondary";
+      return undefined;
     case "outline":
       return "info";
     default:
-      return undefined;
+      return "primary";
   }
 });
 </script>
 
 <template>
-  <Tag :severity="severity" rounded>
+  <ElTag :type="type" :effect="variant === 'outline' ? 'plain' : 'light'">
     <slot />
-  </Tag>
+  </ElTag>
 </template>

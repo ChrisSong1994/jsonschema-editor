@@ -20,10 +20,15 @@ import JsonSchemaEditor from "../../src/components/SchemaEditor/JsonSchemaEditor
 import { en } from "../../src/i18n/locales/en.ts";
 import { provideTranslation } from "../../src/i18n/translation-context.ts";
 import type { Translation } from "../../src/i18n/translation-keys.ts";
-import type { PresetName } from "../../src/themes/presets.ts";
 import { useTheme } from "../../src/themes/useTheme.ts";
 import type { JSONSchema } from "../../src/types/jsonSchema.ts";
 import DemoBlock from "../components/DemoBlock.vue";
+import {
+  type DemoLocale,
+  demoLang,
+  setDemoLang,
+  demoText as t,
+} from "../utils/demoI18n.ts";
 import { exampleSchema } from "../utils/schemaExample.ts";
 
 // ── Reactive translation ──
@@ -31,14 +36,7 @@ const translation = ref<Translation>(en);
 provideTranslation(translation);
 
 // ── Theme ──
-const { currentPreset, darkMode, switchPreset, toggleDarkMode, presetNames } =
-  useTheme();
-const presetLabels: Record<PresetName, string> = {
-  aura: "Aura",
-  material: "Material",
-  nora: "Nora",
-  lara: "Lara",
-};
+const { darkMode, toggleDarkMode } = useTheme();
 
 // ── State ──
 const schema = ref<JSONSchema>(exampleSchema);
@@ -56,17 +54,17 @@ type NavItem = {
   icon?: any;
   children?: { id: string; label: string }[];
 };
-const nav: NavItem[] = [
+const nav = computed<NavItem[]>(() => [
   {
     id: "editor",
     label: "JsonSchemaEditor",
     icon: Layers,
     children: [
-      { id: "editor-basic", label: "Basic" },
-      { id: "editor-visual", label: "Visual Only" },
-      { id: "editor-readonly", label: "Read-Only" },
-      { id: "editor-nofs", label: "No Fullscreen" },
-      { id: "editor-sync", label: "Textbox Sync" },
+      { id: "editor-basic", label: t.value.basic },
+      { id: "editor-visual", label: t.value.visualOnly },
+      { id: "editor-readonly", label: t.value.readOnly },
+      { id: "editor-nofs", label: t.value.noFullscreen },
+      { id: "editor-sync", label: t.value.sync },
     ],
   },
   {
@@ -74,9 +72,9 @@ const nav: NavItem[] = [
     label: "SchemaInferencer",
     icon: Sparkles,
     children: [
-      { id: "infer-popup", label: "Popup" },
-      { id: "infer-inline", label: "Inline" },
-      { id: "infer-util", label: "Utility" },
+      { id: "infer-popup", label: t.value.popup },
+      { id: "infer-inline", label: t.value.inline },
+      { id: "infer-util", label: t.value.utility },
     ],
   },
   {
@@ -84,14 +82,14 @@ const nav: NavItem[] = [
     label: "JsonValidator",
     icon: Zap,
     children: [
-      { id: "validator-popup", label: "Popup" },
-      { id: "validator-inline", label: "Inline" },
-      { id: "validator-util", label: "Utility" },
+      { id: "validator-popup", label: t.value.popup },
+      { id: "validator-inline", label: t.value.inline },
+      { id: "validator-util", label: t.value.utility },
     ],
   },
-  { id: "i18n", label: "Localization", icon: Globe },
-  { id: "theming", label: "Theming", icon: Palette },
-];
+  { id: "i18n", label: t.value.localization, icon: Globe },
+  { id: "theming", label: t.value.theming, icon: Palette },
+]);
 
 const active = ref("editor");
 const expanded = ref<Record<string, boolean>>({
@@ -119,9 +117,10 @@ const langs = [
   { value: "en", label: "English" },
   { value: "zh", label: "中文" },
 ];
-const currentLang = ref("en");
+const currentLang = ref<string>(demoLang.value);
 const switchLang = (val: string) => {
   currentLang.value = val;
+  setDemoLang(val as DemoLocale);
   import(`../../src/i18n/locales/${val}.ts`).then((m) => {
     translation.value = m[val];
   });
@@ -156,7 +155,7 @@ const runValidate = () => {
   import("../../src/utils/jsonValidator.ts").then((m) => {
     const result = m.validateJson(validUtilInput.value, validUtilSchema);
     validUtilOutput.value = result.valid
-      ? "✓ Valid"
+      ? t.value.valid
       : result.errors?.map((e) => `✗ ${e.path}: ${e.message}`).join("\n");
   });
 };
@@ -165,72 +164,80 @@ const runValidate = () => {
 type P = { name: string; type: string; def: string; desc: string };
 type E = { name: string; payload: string; desc: string };
 
-const editorProps: P[] = [
+const editorProps = computed<P[]>(() => [
   {
     name: "schema",
     type: "JSONSchema",
     def: "{ type: 'object' }",
-    desc: "The JSON schema to edit (v-model compatible).",
+    desc: t.value.editorPropSchema,
   },
   {
     name: "readOnly",
     type: "boolean",
     def: "false",
-    desc: "Disable all editing controls.",
+    desc: t.value.editorPropReadOnly,
   },
   {
     name: "showJsonEditor",
     type: "boolean",
     def: "true",
-    desc: "Show the Monaco JSON editor panel.",
+    desc: t.value.editorPropShowJson,
   },
   {
     name: "showFullscreen",
     type: "boolean",
     def: "true",
-    desc: "Show the fullscreen toggle button.",
+    desc: t.value.editorPropShowFullscreen,
   },
-];
-const editorEvents: E[] = [
+]);
+const editorEvents = computed<E[]>(() => [
   {
     name: "update:schema",
     payload: "JSONSchema",
-    desc: "Emitted on every schema change.",
+    desc: t.value.editorEventUpdateSchema,
   },
-];
-const inferProps: P[] = [
+]);
+const inferProps = computed<P[]>(() => [
   {
     name: "visible",
     type: "boolean | undefined",
     def: "undefined",
-    desc: "Dialog visibility. Omit for inline mode.",
+    desc: t.value.inferPropVisible,
   },
-];
-const inferEvents: E[] = [
-  { name: "update:visible", payload: "boolean", desc: "Dialog open/close." },
+]);
+const inferEvents = computed<E[]>(() => [
+  {
+    name: "update:visible",
+    payload: "boolean",
+    desc: t.value.inferEventUpdateVisible,
+  },
   {
     name: "schemaInferred",
     payload: "JSONSchema",
-    desc: "The inferred schema.",
+    desc: t.value.inferEventSchemaInferred,
   },
-];
-const validatorProps: P[] = [
+]);
+const validatorProps = computed<P[]>(() => [
   {
     name: "schema",
     type: "JSONSchema",
     def: "—",
-    desc: "Schema to validate against.",
+    desc: t.value.validatorPropSchema,
   },
   {
     name: "visible",
     type: "boolean | undefined",
     def: "undefined",
-    desc: "Omit for inline mode.",
+    desc: t.value.validatorPropVisible,
   },
-];
-const validatorEvents: E[] = [
-  { name: "update:visible", payload: "boolean", desc: "Dialog open/close." },
-];
+]);
+const validatorEvents = computed<E[]>(() => [
+  {
+    name: "update:visible",
+    payload: "boolean",
+    desc: t.value.validatorEventUpdateVisible,
+  },
+]);
 
 // ── Complete SFC Code Snippets ──
 import { codeSnippets as code } from "../utils/codeSnippets.ts";
@@ -242,15 +249,15 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
     <!-- ───────── Hero ───────── -->
     <header class="relative overflow-hidden border-b border-border/30">
       <div class="absolute inset-0 pointer-events-none"
-           style="background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,.08), transparent)" />
+           style="background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(64,158,255,.08), transparent)" />
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div class="flex items-center gap-3 mb-4">
-          <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+          <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-500/20">
             <Code2 :size="20" class="text-white" />
           </div>
           <div>
             <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">jsonschema-editor</h1>
-            <p class="text-sm text-gray-500 mt-0.5">Interactive JSON Schema editor components for Vue&nbsp;3</p>
+            <p class="text-sm text-gray-500 mt-0.5">{{ t.heroSubtitle }}</p>
           </div>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
@@ -258,9 +265,20 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border bg-white hover:bg-gray-50 transition-colors shadow-sm">
             <Package :size="14" /> npm
           </a>
-          <span class="inline-flex items-center px-2.5 py-1 text-xs font-mono rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+          <span class="inline-flex items-center px-2.5 py-1 text-xs font-mono rounded-full bg-primary-50 text-primary-700 border border-primary-100">
             npm i @fett/jsonschema-editor
           </span>
+          <div class="flex items-center gap-0.5 rounded-lg border border-border bg-white p-0.5 shadow-sm">
+            <button v-for="lang in langs" :key="lang.value" type="button" @click="switchLang(lang.value)"
+              :class="[
+                'px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
+                currentLang === lang.value
+                  ? 'bg-primary-500 text-white shadow-xs'
+                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+              ]">
+              {{ lang.label }}
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -285,7 +303,7 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               :class="[
                 'w-full flex items-center gap-2 px-2.5 py-2 rounded-lg font-semibold transition-colors',
                 active === item.id || active.startsWith(item.id + '-')
-                  ? 'text-blue-700 bg-blue-50/80' : 'text-gray-700 hover:bg-gray-100/70'
+                  ? 'text-primary-700 bg-primary-50/80' : 'text-gray-700 hover:bg-gray-100/70'
               ]">
               <component v-if="item.icon" :is="item.icon" :size="15" class="opacity-60" />
               <span class="grow text-left">{{ item.label }}</span>
@@ -299,7 +317,7 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <button v-for="child in item.children" :key="child.id" type="button" @click="go(child.id)"
                 :class="[
                   'w-full text-left px-2 py-1.5 rounded-md transition-colors',
-                  active === child.id ? 'text-blue-700 bg-blue-50/60 font-medium' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                  active === child.id ? 'text-primary-700 bg-primary-50/60 font-medium' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
                 ]">
                 {{ child.label }}
               </button>
@@ -317,29 +335,28 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
           <!-- ╚══════════════════════════════╝ -->
           <section id="section-editor">
             <div class="flex items-center gap-3 mb-2">
-              <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
+              <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-primary-500 to-cyan-400 flex items-center justify-center">
                 <Layers :size="16" class="text-white" />
               </div>
               <h2 class="text-xl font-bold text-gray-900">JsonSchemaEditor</h2>
             </div>
             <p class="text-gray-500 mb-6 leading-relaxed">
-              Full-featured visual JSON Schema builder with an optional live JSON code view.
-              Supports nested objects, arrays, all draft-07 types, and validation constraints.
+              {{ t.editorDesc }}
             </p>
 
             <!-- API Tables -->
             <div class="grid gap-5 mb-10">
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">Props</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.props }}</h3>
                 <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
                   <table class="w-full text-sm">
                     <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
-                      <th class="px-4 py-2.5 font-medium">Name</th><th class="px-4 py-2.5 font-medium">Type</th>
-                      <th class="px-4 py-2.5 font-medium">Default</th><th class="px-4 py-2.5 font-medium">Description</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.type }}</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.default }}</th><th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="p in editorProps" :key="p.name" class="border-t border-border/40">
-                        <td class="px-4 py-2.5 font-mono text-xs text-blue-600 font-medium">{{ p.name }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-primary-600 font-medium">{{ p.name }}</td>
                         <td class="px-4 py-2.5 font-mono text-xs text-gray-500">{{ p.type }}</td>
                         <td class="px-4 py-2.5 font-mono text-xs text-gray-400">{{ p.def }}</td>
                         <td class="px-4 py-2.5 text-gray-600">{{ p.desc }}</td>
@@ -349,16 +366,16 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
                 </div>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">Events</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.events }}</h3>
                 <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
                   <table class="w-full text-sm">
                     <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
-                      <th class="px-4 py-2.5 font-medium">Name</th><th class="px-4 py-2.5 font-medium">Payload</th>
-                      <th class="px-4 py-2.5 font-medium">Description</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.payload }}</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="e in editorEvents" :key="e.name" class="border-t border-border/40">
-                        <td class="px-4 py-2.5 font-mono text-xs text-blue-600 font-medium">{{ e.name }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-primary-600 font-medium">{{ e.name }}</td>
                         <td class="px-4 py-2.5 font-mono text-xs text-gray-500">{{ e.payload }}</td>
                         <td class="px-4 py-2.5 text-gray-600">{{ e.desc }}</td>
                       </tr>
@@ -370,8 +387,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Basic -->
             <div id="section-editor-basic" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Basic Usage</h3>
-              <p class="text-sm text-gray-500 mb-3">The default configuration with both visual and JSON editor panels.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.basicTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.basicDesc }}</p>
               <DemoBlock :code="code['editor-basic']">
                 <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" class="h-full" />
               </DemoBlock>
@@ -379,8 +396,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Visual Only -->
             <div id="section-editor-visual" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Visual Only</h3>
-              <p class="text-sm text-gray-500 mb-3">Hide the JSON code panel — ideal for end-users who only need the visual builder.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.visualOnlyTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.visualOnlyDesc }}</p>
               <DemoBlock :code="code['editor-visual']">
                 <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" :show-json-editor="false" class="h-full" />
               </DemoBlock>
@@ -388,8 +405,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Read-Only -->
             <div id="section-editor-readonly" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Read-Only</h3>
-              <p class="text-sm text-gray-500 mb-3">Display a schema without allowing modifications.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.readOnlyTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.readOnlyDesc }}</p>
               <DemoBlock :code="code['editor-readonly']">
                 <JsonSchemaEditor :schema="schema" :read-only="true" class="h-full" />
               </DemoBlock>
@@ -397,8 +414,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- No Fullscreen -->
             <div id="section-editor-nofs" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">No Fullscreen Toggle</h3>
-              <p class="text-sm text-gray-500 mb-3">Hide the fullscreen button for embedded layouts.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.noFullscreenTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.noFullscreenDesc }}</p>
               <DemoBlock :code="code['editor-nofs']">
                 <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" :show-fullscreen="false" class="h-full" />
               </DemoBlock>
@@ -406,8 +423,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Textbox Sync -->
             <div id="section-editor-sync" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Textbox Sync</h3>
-              <p class="text-sm text-gray-500 mb-3">A plain textarea mirrors every schema change via the <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">update:schema</code> event.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.syncTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.syncDescA }} <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">update:schema</code> {{ t.syncDescB }}</p>
               <DemoBlock :code="code['editor-sync']">
                 <div class="grid lg:grid-cols-2 gap-4 p-4 h-full">
                   <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" :show-json-editor="false" :show-fullscreen="false" class="h-full" />
@@ -431,18 +448,17 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <h2 class="text-xl font-bold text-gray-900">SchemaInferencer</h2>
             </div>
             <p class="text-gray-500 mb-6 leading-relaxed">
-              Generates a JSON Schema from a sample JSON document. Works as a popup dialog
-              or inline, and is fully decoupled from the editor — you choose how to consume the result.
+              {{ t.inferDesc }}
             </p>
 
             <div class="grid gap-5 mb-10">
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">Props</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.props }}</h3>
                 <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
                   <table class="w-full text-sm">
                     <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
-                      <th class="px-4 py-2.5 font-medium">Name</th><th class="px-4 py-2.5 font-medium">Type</th>
-                      <th class="px-4 py-2.5 font-medium">Default</th><th class="px-4 py-2.5 font-medium">Description</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.type }}</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.default }}</th><th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="p in inferProps" :key="p.name" class="border-t border-border/40">
@@ -456,12 +472,12 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
                 </div>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">Events</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.events }}</h3>
                 <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
                   <table class="w-full text-sm">
                     <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
-                      <th class="px-4 py-2.5 font-medium">Name</th><th class="px-4 py-2.5 font-medium">Payload</th>
-                      <th class="px-4 py-2.5 font-medium">Description</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.payload }}</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="e in inferEvents" :key="e.name" class="border-t border-border/40">
@@ -477,19 +493,19 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Popup -->
             <div id="section-infer-popup" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Popup Mode</h3>
-              <p class="text-sm text-gray-500 mb-3">Open as a dialog, paste JSON, and get a schema back. The inferred schema feeds a separate read-only editor.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.popupTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.inferPopupDesc }}</p>
               <DemoBlock :code="code['infer-popup']">
                 <div class="p-4">
                   <button type="button" @click="inferDialogOpen = true"
                     class="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium hover:shadow-md hover:shadow-amber-500/20 transition-all mb-3">
-                    Open Inferencer
+                    {{ t.openInferencer }}
                   </button>
                   <div v-if="Object.keys((inferPopupSchema as any).properties || {}).length"
                     class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white" style="height:380px">
                     <JsonSchemaEditor :schema="inferPopupSchema" :read-only="true" class="h-full" />
                   </div>
-                  <p v-else class="text-sm text-gray-400 italic">Inferred schema will appear here.</p>
+                  <p v-else class="text-sm text-gray-400 italic">{{ t.inferredPlaceholder }}</p>
                   <SchemaInferencer :visible="inferDialogOpen" @update:visible="inferDialogOpen = $event" @schema-inferred="inferPopupSchema = $event" />
                 </div>
               </DemoBlock>
@@ -497,16 +513,16 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Inline -->
             <div id="section-infer-inline" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Inline Mode</h3>
-              <p class="text-sm text-gray-500 mb-3">Omit <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">:visible</code> to render inline. Here the inferred schema feeds a separate editor below.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.inlineTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.omitVisibleA }} <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">:visible</code> {{ t.omitVisibleB }} {{ t.inferInlineExtra }}</p>
               <DemoBlock :code="code['infer-inline']">
                 <div class="grid lg:grid-cols-2 gap-4 p-4">
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">1 — Paste JSON</p>
+                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.stepPasteJson }}</p>
                     <SchemaInferencer @schema-inferred="inferInlineSchema = $event" />
                   </div>
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">2 — Resulting schema</p>
+                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.stepResultSchema }}</p>
                     <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white" style="height:368px">
                       <JsonSchemaEditor :schema="inferInlineSchema" @update:schema="inferInlineSchema = $event" :show-json-editor="false" :show-fullscreen="false" class="h-full" />
                     </div>
@@ -517,19 +533,19 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Utility -->
             <div id="section-infer-util" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Utility Function</h3>
-              <p class="text-sm text-gray-500 mb-3">A pure function — no Vue required. Pass any JS object, get a JSON Schema back.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.utilityTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.inferUtilDesc }}</p>
               <DemoBlock :code="code['infer-util']" language="typescript">
                 <div class="grid lg:grid-cols-2 gap-4 p-4">
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Input (JSON)</p>
+                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.inputJson }}</p>
                     <textarea v-model="utilInput" class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono resize-none w-full h-36 focus:outline-none shadow-xs" />
                     <button type="button" @click="runInfer"
-                      class="mt-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium hover:shadow-md transition-all">Run</button>
+                      class="mt-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium hover:shadow-md transition-all">{{ t.run }}</button>
                   </div>
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Output (Schema)</p>
-                    <pre class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono h-36 overflow-auto shadow-xs">{{ utilOutput || 'Press Run' }}</pre>
+                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.outputSchema }}</p>
+                    <pre class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono h-36 overflow-auto shadow-xs">{{ utilOutput || t.pressRun }}</pre>
                   </div>
                 </div>
               </DemoBlock>
@@ -549,18 +565,17 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <h2 class="text-xl font-bold text-gray-900">JsonValidator</h2>
             </div>
             <p class="text-gray-500 mb-6 leading-relaxed">
-              Validates a JSON document against any schema with real-time inline error display.
-              Also available as a pure utility function for headless use.
+              {{ t.validatorDesc }}
             </p>
 
             <div class="grid gap-5 mb-10">
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">Props</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.props }}</h3>
                 <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
                   <table class="w-full text-sm">
                     <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
-                      <th class="px-4 py-2.5 font-medium">Name</th><th class="px-4 py-2.5 font-medium">Type</th>
-                      <th class="px-4 py-2.5 font-medium">Default</th><th class="px-4 py-2.5 font-medium">Description</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.type }}</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.default }}</th><th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="p in validatorProps" :key="p.name" class="border-t border-border/40">
@@ -574,12 +589,12 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
                 </div>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">Events</h3>
+                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.events }}</h3>
                 <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
                   <table class="w-full text-sm">
                     <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
-                      <th class="px-4 py-2.5 font-medium">Name</th><th class="px-4 py-2.5 font-medium">Payload</th>
-                      <th class="px-4 py-2.5 font-medium">Description</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.payload }}</th>
+                      <th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="e in validatorEvents" :key="e.name" class="border-t border-border/40">
@@ -595,15 +610,15 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Popup -->
             <div id="section-validator-popup" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Popup Mode</h3>
-              <p class="text-sm text-gray-500 mb-3">Open a dialog, paste JSON, and validate against the current schema.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.popupTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.validatorPopupDesc }}</p>
               <DemoBlock :code="code['validator-popup']">
                 <div class="p-4">
                   <button type="button" @click="validatorDialogOpen = true"
                     class="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium hover:shadow-md hover:shadow-emerald-500/20 transition-all">
-                    Open Validator
+                    {{ t.openValidator }}
                   </button>
-                  <p class="text-sm text-gray-400 mt-2">Validates against the schema from the editor above.</p>
+                  <p class="text-sm text-gray-400 mt-2">{{ t.validatesAgainst }}</p>
                   <JsonValidator :visible="validatorDialogOpen" @update:visible="validatorDialogOpen = $event" :schema="schema" />
                 </div>
               </DemoBlock>
@@ -611,8 +626,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Inline -->
             <div id="section-validator-inline" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Inline Mode</h3>
-              <p class="text-sm text-gray-500 mb-3">Omit <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">:visible</code> to render inline.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.inlineTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.omitVisibleA }} <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">:visible</code> {{ t.omitVisibleB }}</p>
               <DemoBlock :code="code['validator-inline']">
                 <div class="p-4">
                   <JsonValidator :schema="schema" />
@@ -622,19 +637,19 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Utility -->
             <div id="section-validator-util" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">Utility Function</h3>
-              <p class="text-sm text-gray-500 mb-3">Pure function — no Vue required. Returns structured errors with paths and line numbers.</p>
+              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.utilityTitle }}</h3>
+              <p class="text-sm text-gray-500 mb-3">{{ t.validatorUtilDesc }}</p>
               <DemoBlock :code="code['validator-util']" language="typescript">
                 <div class="grid lg:grid-cols-2 gap-4 p-4">
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Input</p>
+                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.input }}</p>
                     <textarea v-model="validUtilInput" class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono resize-none w-full h-36 focus:outline-none shadow-xs" />
                     <button type="button" @click="runValidate"
-                      class="mt-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium hover:shadow-md transition-all">Validate</button>
+                      class="mt-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium hover:shadow-md transition-all">{{ t.validate }}</button>
                   </div>
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Result</p>
-                    <pre class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono h-36 overflow-auto whitespace-pre-wrap shadow-xs">{{ validUtilOutput || 'Press Validate' }}</pre>
+                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.result }}</p>
+                    <pre class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono h-36 overflow-auto whitespace-pre-wrap shadow-xs">{{ validUtilOutput || t.pressValidate }}</pre>
                   </div>
                 </div>
               </DemoBlock>
@@ -651,25 +666,22 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                 <Globe :size="16" class="text-white" />
               </div>
-              <h2 class="text-xl font-bold text-gray-900">Localization</h2>
+              <h2 class="text-xl font-bold text-gray-900">{{ t.localization }}</h2>
             </div>
             <p class="text-gray-500 mb-6 leading-relaxed">
-              All components share a reactive translation context via Vue's
-              <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">provide</code> /
-              <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">inject</code>.
-              Provide a <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">Ref&lt;Translation&gt;</code> and change its value to switch languages at runtime.
+              {{ t.i18nDesc }}
             </p>
 
             <DemoBlock :code="code.i18n">
               <div class="p-4">
                 <div class="mb-4">
-                  <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Available Locales</p>
+                  <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.availableLocales }}</p>
                   <div class="flex flex-wrap gap-2">
                     <button v-for="lang in langs" :key="lang.value" type="button" @click="switchLang(lang.value)"
                       :class="[
                         'px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all',
                         currentLang === lang.value
-                          ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md shadow-violet-500/20'
+                          ? 'bg-gradient-to-r from-primary-500 to-primary-700 text-white shadow-md shadow-primary-500/20'
                           : 'bg-white border border-border/60 text-gray-600 hover:bg-gray-50 hover:shadow-xs'
                       ]">
                       {{ lang.label }}
@@ -693,33 +705,16 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
                 <Palette :size="16" class="text-white" />
               </div>
-              <h2 class="text-xl font-bold text-gray-900">Theming</h2>
+              <h2 class="text-xl font-bold text-gray-900">{{ t.theming }}</h2>
             </div>
             <p class="text-gray-500 mb-6 leading-relaxed">
-              Switch between built-in PrimeVue presets at runtime and toggle dark mode.
-              The <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">useTheme</code> composable provides
-              reactive state for the active preset and dark mode.
+              {{ t.themingDesc }}
             </p>
 
             <DemoBlock :code="code.theming">
               <div class="p-4">
                 <div class="mb-4">
-                  <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Preset</p>
-                  <div class="flex flex-wrap gap-2">
-                    <button v-for="name in presetNames" :key="name" type="button" @click="switchPreset(name)"
-                      :class="[
-                        'px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all capitalize',
-                        currentPreset === name
-                          ? 'bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-md shadow-pink-500/20'
-                          : 'bg-white border border-border/60 text-gray-600 hover:bg-gray-50 hover:shadow-xs'
-                      ]">
-                      {{ presetLabels[name] }}
-                    </button>
-                  </div>
-                </div>
-
-                <div class="mb-4">
-                  <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Dark Mode</p>
+                  <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.darkMode }}</p>
                   <button type="button" @click="toggleDarkMode()"
                     :class="[
                       'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all',
@@ -729,7 +724,7 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
                     ]">
                     <Moon v-if="darkMode" :size="14" />
                     <Sun v-else :size="14" />
-                    {{ darkMode ? 'Dark' : 'Light' }}
+                    {{ darkMode ? t.dark : t.light }}
                   </button>
                 </div>
 
@@ -742,7 +737,7 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
           <!-- Footer -->
           <footer class="text-center text-xs text-gray-400 pt-8 pb-12 border-t border-border/20">
-            Built with Vue&nbsp;3 · MIT License
+            {{ t.footer }}
           </footer>
 
         </div>

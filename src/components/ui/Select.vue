@@ -1,27 +1,43 @@
 <script setup lang="ts">
-import PSelect from "primevue/select";
+import {
+  ElOption,
+  ElSelect,
+} from "element-plus/es/components/select/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/select/style/css";
+import { computed } from "vue";
+
+const props = withDefaults(
+  defineProps<{
+    options: { label: string; value: string }[];
+    placeholder?: string;
+    id?: string;
+    class?: string;
+  }>(),
+  {},
+);
 
 const model = defineModel<string>();
 
-defineProps<{
-  options: { label: string; value: string }[];
-  placeholder?: string;
-  id?: string;
-  class?: string;
-}>();
+const value = computed({
+  get: () => model.value ?? "",
+  set: (v: string) => (model.value = v),
+});
 </script>
 
 <template>
-	<PSelect
-		v-model="model"
-		:options="options"
-		optionLabel="label"
-		optionValue="value"
-		:placeholder="placeholder"
-		:id="id"
-		:class="$props.class"
-		appendTo="body"
-		:pt="{ overlay: { class: 'jscb' } }"
-		fluid
-	/>
+  <ElSelect
+    v-model="value"
+    :placeholder="props.placeholder"
+    :id="props.id"
+    :class="props.class"
+    class="w-full"
+  >
+    <ElOption
+      v-for="opt in props.options"
+      :key="opt.value"
+      :label="opt.label"
+      :value="opt.value"
+    />
+  </ElSelect>
 </template>

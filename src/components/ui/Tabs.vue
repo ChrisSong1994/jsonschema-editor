@@ -1,27 +1,28 @@
 <script setup lang="ts">
-import Tab from "primevue/tab";
-import TabList from "primevue/tablist";
-import TabPanel from "primevue/tabpanel";
-import TabPanels from "primevue/tabpanels";
-import Tabs from "primevue/tabs";
+import {
+  ElTabPane,
+  ElTabs,
+} from "element-plus/es/components/tabs/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/tabs/style/css";
 
-const model = defineModel<string>();
-
-defineProps<{
+const props = defineProps<{
   tabs: { value: string; label: string }[];
   class?: string;
 }>();
+
+const model = defineModel<string>();
 </script>
 
 <template>
-  <Tabs v-model:value="model" :class="$props.class">
-    <TabList>
-      <Tab v-for="tab in tabs" :key="tab.value" :value="tab.value">
-        {{ tab.label }}
-      </Tab>
-    </TabList>
-    <TabPanels>
-      <slot />
-    </TabPanels>
-  </Tabs>
+  <ElTabs v-model="model" :class="props.class" class="w-full">
+    <ElTabPane
+      v-for="tab in props.tabs"
+      :key="tab.value"
+      :name="tab.value"
+      :label="tab.label"
+    >
+      <slot :name="tab.value" />
+    </ElTabPane>
+  </ElTabs>
 </template>

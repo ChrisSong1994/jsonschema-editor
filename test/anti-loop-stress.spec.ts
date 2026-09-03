@@ -1,6 +1,5 @@
 import { mount } from "@vue/test-utils";
-import PrimeVue from "primevue/config";
-import Tooltip from "primevue/tooltip";
+import ElementPlus from "element-plus";
 import { describe, expect, it } from "vitest";
 import { nextTick } from "vue";
 import SchemaVisualEditor from "../src/components/SchemaEditor/SchemaVisualEditor.vue";
@@ -16,8 +15,7 @@ function mountWithStore(component: any, storeSchema: JSONSchema) {
   const store = createSchemaStore(storeSchema);
   const wrapper = mount(component, {
     global: {
-      plugins: [PrimeVue],
-      directives: { tooltip: Tooltip },
+      plugins: [ElementPlus],
       provide: {
         [TranslationKey as symbol]: en,
         [SchemaStoreKey as symbol]: store,

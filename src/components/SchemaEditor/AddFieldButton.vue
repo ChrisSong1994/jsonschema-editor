@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import ElTooltip from "element-plus/es/components/tooltip/index";
+import "element-plus/theme-chalk/dark/css-vars.css";
+import "element-plus/es/components/tooltip/style/css";
 import { CirclePlus, HelpCircle, Info } from "lucide-vue-next";
 import { ref, useId } from "vue";
 import Badge from "../../components/ui/Badge.vue";
@@ -72,7 +75,7 @@ const handleSubmit = (e: Event) => {
   <Dialog
     :visible="dialogOpen"
     @update:visible="dialogOpen = $event"
-    class="md:max-w-[1200px] max-h-[85vh] w-[95vw] p-4 sm:p-6 jscb"
+    class="md:max-w-[1200px]! max-h-[85vh]! w-[95vw]! p-4! sm:p-6! overflow-auto! jscb"
   >
     <template #header>
       <div class="mb-4">
@@ -90,7 +93,9 @@ const handleSubmit = (e: Event) => {
           <div>
             <div class="flex flex-wrap items-center gap-2 mb-1.5">
               <label :for="fieldNameId" class="text-sm font-medium">{{ t.fieldNameLabel }}</label>
-              <Info class="h-4 w-4 text-muted-foreground shrink-0" v-tooltip="t.fieldNameTooltip" />
+              <ElTooltip :content="t.fieldNameTooltip" placement="top">
+                <Info class="h-4 w-4 text-muted-foreground shrink-0" />
+              </ElTooltip>
             </div>
             <InputField
               :id="fieldNameId"
@@ -104,7 +109,9 @@ const handleSubmit = (e: Event) => {
           <div>
             <div class="flex flex-wrap items-center gap-2 mb-1.5">
               <label :for="fieldDescId" class="text-sm font-medium">{{ t.fieldDescription }}</label>
-              <Info class="h-4 w-4 text-muted-foreground shrink-0" v-tooltip="t.fieldDescriptionTooltip" />
+              <ElTooltip :content="t.fieldDescriptionTooltip" placement="top">
+                <Info class="h-4 w-4 text-muted-foreground shrink-0" />
+              </ElTooltip>
             </div>
             <InputField
               :id="fieldDescId"
@@ -132,7 +139,9 @@ const handleSubmit = (e: Event) => {
               class="rounded border-gray-300 shrink-0"
             />
             <label :for="additionalPropertiesId" class="text-sm">{{ t.additionalPropertiesAllow }}</label>
-            <Info class="h-4 w-4 text-muted-foreground shrink-0" v-tooltip="t.additionalPropertiesTooltip" />
+            <ElTooltip :content="t.additionalPropertiesTooltip" placement="top">
+              <Info class="h-4 w-4 text-muted-foreground shrink-0" />
+            </ElTooltip>
           </div>
         </div>
 
@@ -140,7 +149,9 @@ const handleSubmit = (e: Event) => {
           <div>
             <div class="flex flex-wrap items-center gap-2 mb-1.5">
               <label :for="fieldTypeId" class="text-sm font-medium">{{ t.fieldType }}</label>
-              <HelpCircle class="h-4 w-4 text-muted-foreground shrink-0" v-tooltip="t.fieldTypeTooltipString" />
+              <ElTooltip :content="t.fieldTypeTooltipString" placement="top">
+                <HelpCircle class="h-4 w-4 text-muted-foreground shrink-0" />
+              </ElTooltip>
             </div>
             <SchemaTypeSelector :id="fieldTypeId" v-model="fieldType" />
           </div>

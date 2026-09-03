@@ -1,6 +1,5 @@
 import { mount } from "@vue/test-utils";
-import PrimeVue from "primevue/config";
-import Tooltip from "primevue/tooltip";
+import ElementPlus from "element-plus";
 import { describe, expect, it } from "vitest";
 import { nextTick } from "vue";
 import SchemaVisualEditor from "../src/components/SchemaEditor/SchemaVisualEditor.vue";
@@ -21,8 +20,7 @@ function mountWithStore(component: any, options: any = {}) {
     ...options,
     global: {
       ...(options.global || {}),
-      plugins: [...(options.global?.plugins || []), PrimeVue],
-      directives: { tooltip: Tooltip },
+      plugins: [...(options.global?.plugins || []), ElementPlus],
       provide: {
         ...(options.global?.provide || {}),
         [TranslationKey as symbol]: en,
@@ -58,8 +56,8 @@ describe("Schema Interactions", () => {
       // Verify initial state: "person" is an object
       expect(store.schema.value?.properties?.person?.type).toBe("object");
 
-      // Use store API to change the type (TypeDropdown is now a PrimeVue Select
-      // whose overlay is teleported to <body> and not testable in JSDom)
+      // Use store API to change the type (TypeDropdown is an Element Plus Select
+      // whose overlay is teleported to <body> and not easily testable in JSDom)
       store.updateProperty([], "person", { type: "string" });
 
       // Give the store and vue reactivity time to settle
