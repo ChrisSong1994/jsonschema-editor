@@ -93,10 +93,16 @@ const en = {
   availableLocales: "Available Locales",
 
   themingDesc:
-    "Toggle dark mode at runtime. The useTheme composable provides reactive dark-mode state.",
+    "Switch dark mode and brand-color presets at runtime. The useTheme composable provides reactive theme state.",
   darkMode: "Dark Mode",
   dark: "Dark",
   light: "Light",
+  colorPreset: "Color Preset",
+  blue: "Blue",
+  green: "Green",
+  violet: "Violet",
+  rose: "Rose",
+  amber: "Amber",
 
   footer: "Built with Vue 3 · MIT License",
 
@@ -195,10 +201,17 @@ const zh: DemoText = {
     "所有组件通过 Vue 的 provide / inject 共享响应式翻译上下文。提供一个 Ref<Translation> 并在运行时修改它的值，即可切换语言。",
   availableLocales: "可用语言",
 
-  themingDesc: "运行时开关深色模式。useTheme 组合式函数提供响应式的深色模式状态。",
+  themingDesc:
+    "运行时切换深色模式与品牌主色预设。useTheme 组合式函数提供响应式的主题状态。",
   darkMode: "深色模式",
   dark: "深色",
   light: "浅色",
+  colorPreset: "主色预设",
+  blue: "蓝色",
+  green: "绿色",
+  violet: "紫色",
+  rose: "玫红",
+  amber: "琥珀",
 
   footer: "基于 Vue 3 构建 · MIT 许可证",
 

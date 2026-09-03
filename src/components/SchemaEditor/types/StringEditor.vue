@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-  ElInputNumber,
-} from "element-plus/es/components/input-number/index";
+import { ElInputNumber } from "element-plus/es/components/input-number/index";
 import { ElTag } from "element-plus/es/components/tag/index";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "element-plus/es/components/input-number/style/css";
@@ -227,7 +225,7 @@ const needsDetail = computed(
       />
     </div>
 
-    <div v-if="!readOnly || enumValues.length > 0" class="space-y-2 pt-2 border-t" style="border-color: var(--p-content-border-color);">
+    <div v-if="!readOnly || enumValues.length > 0" class="space-y-2 pt-2 border-t" style="border-color: var(--el-border-color);">
       <label class="text-sm font-medium">{{ t.stringAllowedValuesEnumLabel }}</label>
 
       <div class="flex flex-wrap gap-2 mb-4">
@@ -242,7 +240,7 @@ const needsDetail = computed(
             {{ value }}
           </ElTag>
         </template>
-        <p v-else class="text-xs italic" style="color: var(--p-text-muted-color);">
+        <p v-else class="text-xs italic" style="color: var(--el-text-color-secondary);">
           {{ t.stringAllowedValuesEnumNone }}
         </p>
       </div>

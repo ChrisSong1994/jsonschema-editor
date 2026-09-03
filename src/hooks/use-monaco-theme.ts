@@ -69,7 +69,9 @@ export function useMonacoTheme() {
   let observer: MutationObserver | null = null;
 
   const checkDarkMode = () => {
-    isDarkMode.value = document.documentElement.classList.contains("jscb-dark");
+    // `useTheme` toggles `.dark` on <html> (and on .jscb scopes). Follow the
+    // same marker so Monaco's built-in vs / vs-dark themes track the app.
+    isDarkMode.value = document.documentElement.classList.contains("dark");
   };
 
   onMounted(() => {

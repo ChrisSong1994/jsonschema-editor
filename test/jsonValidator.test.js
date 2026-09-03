@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { describe, test } from "node:test";
-import { exampleSchema } from "../demo/utils/schemaExample.ts";
+import { exampleSchema } from "../example/utils/schemaExample.ts";
 import {
   extractErrorPosition,
   findLineNumberForPath,

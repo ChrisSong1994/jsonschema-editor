@@ -4,56 +4,60 @@
 
 @theme {
   /*
-   * Map Tailwind color utilities to PrimeVue SEMANTIC tokens.
-   * These tokens automatically switch between light/dark mode values
-   * when PrimeVue's darkModeSelector is active.
+   * Map Tailwind color utilities to Element Plus CSS variables.
+   * Element Plus exposes semantic tokens on :root (light) and inherits
+   * dark overrides via `html.dark` (see theme-chalk dark/css-vars.css).
+   * These tokens switch automatically between light/dark mode values.
    *
-   * Semantic tokens used:
-   *   --p-content-background   (light: white, dark: surface.900)
-   *   --p-content-hover-background (light: surface.100, dark: surface.800)
-   *   --p-content-border-color (light: surface.200, dark: surface.700)
-   *   --p-text-color           (light: surface.700, dark: surface.0)
-   *   --p-text-muted-color     (light: surface.500, dark: surface.400)
-   *   --p-primary-color        (auto per preset)
-   *   --p-primary-contrast-color (auto per preset)
+   * Element Plus tokens used:
+   *   --el-bg-color                  page/panel background
+   *   --el-bg-color-overlay          popover / card surface
+   *   --el-text-color-primary        main text
+   *   --el-text-color-secondary / regular  muted text
+   *   --el-fill-color-light          subtle fill (secondary/neutral)
+   *   --el-border-color              borders
+   *   --el-color-primary             brand color (auto per preset)
+   *   --el-color-primary-light-3/5/7/8/9  brand tints
+   *   --el-color-primary-dark-2      brand shade
+   *   --el-color-danger              destructive
    */
-  --color-background: var(--p-content-background);
-  --color-foreground: var(--p-text-color);
-  --color-border: var(--p-content-border-color);
-  --color-input: var(--p-content-border-color);
-  --color-ring: var(--p-primary-color);
+  --color-background: var(--el-bg-color);
+  --color-foreground: var(--el-text-color-primary);
+  --color-border: var(--el-border-color);
+  --color-input: var(--el-border-color);
+  --color-ring: var(--el-color-primary-light-5);
 
-  --color-primary: var(--p-primary-color);
-  --color-primary-foreground: var(--p-primary-contrast-color);
-  --color-primary-50: var(--p-primary-50);
-  --color-primary-100: var(--p-primary-100);
-  --color-primary-200: var(--p-primary-200);
-  --color-primary-300: var(--p-primary-300);
-  --color-primary-400: var(--p-primary-400);
-  --color-primary-500: var(--p-primary-500);
-  --color-primary-600: var(--p-primary-600);
-  --color-primary-700: var(--p-primary-700);
-  --color-primary-800: var(--p-primary-800);
-  --color-primary-900: var(--p-primary-900);
-  --color-primary-950: var(--p-primary-950);
+  --color-primary: var(--el-color-primary);
+  --color-primary-foreground: var(--el-color-primary-light-9);
+  --color-primary-50: var(--el-color-primary-light-9);
+  --color-primary-100: var(--el-color-primary-light-8);
+  --color-primary-200: var(--el-color-primary-light-7);
+  --color-primary-300: var(--el-color-primary-light-6);
+  --color-primary-400: var(--el-color-primary-light-5);
+  --color-primary-500: var(--el-color-primary-light-3);
+  --color-primary-600: var(--el-color-primary);
+  --color-primary-700: var(--el-color-primary);
+  --color-primary-800: var(--el-color-primary-dark-2);
+  --color-primary-900: var(--el-color-primary-dark-2);
+  --color-primary-950: var(--el-color-primary-dark-2);
 
-  --color-secondary: var(--p-content-hover-background);
-  --color-secondary-foreground: var(--p-text-color);
+  --color-secondary: var(--el-fill-color-light);
+  --color-secondary-foreground: var(--el-text-color-primary);
 
-  --color-destructive: hsl(0 84.2% 60.2%);
-  --color-destructive-foreground: var(--p-content-background);
+  --color-destructive: var(--el-color-danger);
+  --color-destructive-foreground: var(--el-color-primary-light-9);
 
-  --color-muted: var(--p-content-hover-background);
-  --color-muted-foreground: var(--p-text-muted-color);
+  --color-muted: var(--el-fill-color-light);
+  --color-muted-foreground: var(--el-text-color-secondary);
 
-  --color-accent: var(--p-content-hover-background);
-  --color-accent-foreground: var(--p-text-color);
+  --color-accent: var(--el-fill-color-light);
+  --color-accent-foreground: var(--el-text-color-primary);
 
-  --color-popover: var(--p-overlay-popover-background);
-  --color-popover-foreground: var(--p-overlay-popover-color);
+  --color-popover: var(--el-bg-color-overlay);
+  --color-popover-foreground: var(--el-text-color-primary);
 
-  --color-card: var(--p-content-background);
-  --color-card-foreground: var(--p-text-color);
+  --color-card: var(--el-bg-color);
+  --color-card-foreground: var(--el-text-color-primary);
 
   --radius-lg: 0.8rem;
   --radius-md: calc(0.8rem - 2px);
@@ -169,24 +173,24 @@
   @apply flex items-center gap-2 py-2 px-3 rounded-md transition-colors;
 
   &:hover {
-    background: var(--p-content-hover-background);
+    background: var(--el-fill-color-light);
   }
 }
 
 @utility json-field-label {
   @apply text-sm font-medium;
-  color: var(--p-text-color);
+  color: var(--el-text-color-primary);
 }
 
 @utility json-editor-container {
-  background: var(--p-content-background);
-  border: 1px solid var(--p-content-border-color);
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color);
   @apply backdrop-blur-md rounded-xl shadow-xs;
 }
 
 @utility glass-panel {
-  background: var(--p-content-background);
-  border: 1px solid var(--p-content-border-color);
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color);
   @apply backdrop-blur-md rounded-xl shadow-xs;
 }
 
@@ -200,11 +204,11 @@
 
 @utility field-button {
   @apply flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors;
-  background: var(--p-content-hover-background);
-  color: var(--p-text-color);
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-primary);
 
   &:hover {
-    background: var(--p-content-border-color);
+    background: var(--el-border-color-light);
   }
 }
 

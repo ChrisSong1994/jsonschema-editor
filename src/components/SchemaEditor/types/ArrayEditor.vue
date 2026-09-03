@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-  ElInputNumber,
-} from "element-plus/es/components/input-number/index";
+import { ElInputNumber } from "element-plus/es/components/input-number/index";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "element-plus/es/components/input-number/style/css";
 import { computed, ref, useId } from "vue";
@@ -181,7 +179,7 @@ const maxItemsError = computed(
       <Label :for="uniqueItemsId" class="cursor-pointer">{{ t.arrayForceUniqueItemsLabel }}</Label>
     </div>
 
-    <div class="space-y-2 pt-4" :style="(!readOnly || !!minItems || !!maxItems || !!uniqueItems) ? 'border-top: 1px solid var(--p-content-border-color)' : ''">
+    <div class="space-y-2 pt-4" :style="(!readOnly || !!minItems || !!maxItems || !!uniqueItems) ? 'border-top: 1px solid var(--el-border-color)' : ''">
       <div class="flex items-center justify-between mb-4">
         <Label>{{ t.arrayItemTypeLabel }}</Label>
         <TypeDropdown

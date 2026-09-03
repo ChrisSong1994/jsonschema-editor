@@ -256,18 +256,28 @@ ${ES}
 
   theming: `${S}
 import { ref } from "vue"
-import { JsonSchemaEditor, useTheme } from "@fett/jsonschema-editor"
+import {
+  JsonSchemaEditor,
+  THEME_PRESETS,
+  useTheme,
+} from "@fett/jsonschema-editor"
 import type { JSONSchema } from "@fett/jsonschema-editor"
 
 const schema = ref<JSONSchema>({ type: "object", properties: {} })
 
-const { darkMode, toggleDarkMode } = useTheme()
+const { darkMode, toggleDarkMode, preset, setPreset } = useTheme()
 ${ES}
 
 <template>
   <button @click="toggleDarkMode()">
     {{ darkMode ? '☀️ Light' : '🌙 Dark' }}
   </button>
+
+  <select :value="preset" @change="setPreset($event.target.value)">
+    <option v-for="key in Object.keys(THEME_PRESETS)" :key="key" :value="key">
+      {{ key }}
+    </option>
+  </select>
 
   <JsonSchemaEditor v-model:schema="schema" />
 </template>`,

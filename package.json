@@ -32,10 +32,10 @@
     "./styles.css": "./dist/index.css"
   },
   "scripts": {
-    "dev": "BUILD_MODE=demo vite",
-    "preview": "BUILD_MODE=demo vite preview",
+    "dev": "pnpm -C example dev",
+    "preview": "pnpm -C example preview",
     "build": "vite build",
-    "build:demo": "BUILD_MODE=demo vite build",
+    "build:demo": "pnpm -C example build",
     "lint": "biome lint .",
     "format": "biome format . --write",
     "check": "biome check .",

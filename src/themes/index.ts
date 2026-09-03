@@ -1,2 +1,8 @@
 /** Theme system for jsonschema-editor */
-export { useTheme } from "./useTheme.ts";
+export {
+  THEME_PRESET_KEYS,
+  THEME_PRESETS,
+  type ThemePreset,
+  type ThemePresetDefinition,
+  useTheme,
+} from "./useTheme.ts";

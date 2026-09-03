@@ -41,6 +41,7 @@ const emit = defineEmits<{
 const editorContainer = ref<HTMLDivElement | null>(null);
 const loadError = ref(false);
 const {
+  isDarkMode,
   currentTheme,
   defineMonacoThemes,
   configureJsonDefaults,
@@ -130,6 +131,13 @@ onUnmounted(() => {
   if (pendingEmit) clearTimeout(pendingEmit);
   editorInstance?.dispose();
   editorInstance = null;
+});
+
+// Re-apply the current theme when dark mode (or brand preset) changes, so the
+// editor follows the app theme without a full remount.
+watch(isDarkMode, () => {
+  if (!editorInstance) return;
+  editorInstance.updateOptions({ theme: currentTheme() });
 });
 
 /** Expose a layout method for the parent to call when visibility changes */

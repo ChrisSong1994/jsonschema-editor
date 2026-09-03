@@ -1,0 +1,19 @@
+{
+  "name": "@fett/jsonschema-editor-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "preview": "vite preview",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "vue": "^3.5.0",
+    "element-plus": "^2.14.5",
+    "monaco-editor": "^0.55.1"
+  },
+  "devDependencies": {
+    "vite": "^6.4.1",
+    "@vitejs/plugin-vue": "^6.0.4"
+  }
+}

@@ -2,7 +2,7 @@
   "extends": "../tsconfig-base.json",
   "compilerOptions": {
     "composite": true,
-    "outDir": "../build/ts/demo"
+    "outDir": "../build/ts/example"
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "references": [

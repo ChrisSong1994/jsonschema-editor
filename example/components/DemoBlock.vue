@@ -70,12 +70,12 @@ const copyCode = () => {
 </script>
 
 <template>
-  <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
+  <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card">
     <div class="relative">
       <button
         type="button"
         @click="copyCode"
-        class="absolute right-3 top-2 z-10 text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
+        class="absolute right-3 top-2 z-10 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
       >
         <Check v-if="copiedId" :size="12" class="text-green-500" />
         <Clipboard v-else :size="12" />
@@ -95,7 +95,7 @@ const copyCode = () => {
             <span class="flex items-center gap-1.5"><Code2 :size="13" /> {{ demoText.codeTab }}</span>
           </template>
           <div
-            class="overflow-auto bg-[#f6f8fa]"
+            class="overflow-auto bg-muted"
             :style="{ height: cachedHeight + 'px' }"
           >
             <pre class="px-5 py-4 text-[13px] leading-relaxed"><code class="hljs" v-html="highlightedCode" /></pre>

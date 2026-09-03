@@ -22,7 +22,11 @@ export type { Translation } from "./i18n/translation-keys.ts";
 // Utilities
 export { createSchemaFromJson, inferSchema } from "./lib/schema-inference.ts";
 // Themes
-export { useTheme } from "./themes/index.ts";
+export { useTheme, THEME_PRESETS, THEME_PRESET_KEYS } from "./themes/index.ts";
+export type {
+  ThemePreset,
+  ThemePresetDefinition,
+} from "./themes/index.ts";
 // Types
 export type {
   JSONSchema,

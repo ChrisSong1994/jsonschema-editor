@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-  ElInputNumber,
-} from "element-plus/es/components/input-number/index";
+import { ElInputNumber } from "element-plus/es/components/input-number/index";
 import { ElTag } from "element-plus/es/components/tag/index";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "element-plus/es/components/input-number/style/css";
@@ -180,7 +178,7 @@ const multipleOfValue = computed(() => multipleOf.value ?? null);
 
 <template>
   <div class="space-y-4">
-    <p v-if="readOnly && !hasConstraint" class="text-sm italic" style="color: var(--p-text-muted-color);">
+    <p v-if="readOnly && !hasConstraint" class="text-sm italic" style="color: var(--el-text-color-secondary);">
       {{ t.numberNoConstraint }}
     </p>
 
@@ -268,7 +266,7 @@ const multipleOfValue = computed(() => multipleOf.value ?? null);
       <div v-if="!!multipleOfError" class="text-xs text-red-500 italic whitespace-pre-line">{{ multipleOfError }}</div>
     </div>
 
-    <div v-if="!readOnly || enumValues.length > 0" class="space-y-2 pt-2 border-t" style="border-color: var(--p-content-border-color);">
+    <div v-if="!readOnly || enumValues.length > 0" class="space-y-2 pt-2 border-t" style="border-color: var(--el-border-color);">
       <label :class="['text-sm font-medium', !!enumError && 'text-red-500']">{{ t.numberAllowedValuesEnumLabel }}</label>
       <div class="flex flex-wrap gap-2 mb-4">
         <template v-if="enumValues.length > 0">
@@ -282,7 +280,7 @@ const multipleOfValue = computed(() => multipleOf.value ?? null);
             {{ value }}
           </ElTag>
         </template>
-        <p v-else class="text-xs italic" style="color: var(--p-text-muted-color);">{{ t.numberAllowedValuesEnumNone }}</p>
+        <p v-else class="text-xs italic" style="color: var(--el-text-color-secondary);">{{ t.numberAllowedValuesEnumNone }}</p>
       </div>
       <div class="flex items-center gap-2">
         <ElInputNumber

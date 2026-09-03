@@ -20,11 +20,17 @@ import JsonSchemaEditor from "../../src/components/SchemaEditor/JsonSchemaEditor
 import { en } from "../../src/i18n/locales/en.ts";
 import { provideTranslation } from "../../src/i18n/translation-context.ts";
 import type { Translation } from "../../src/i18n/translation-keys.ts";
-import { useTheme } from "../../src/themes/useTheme.ts";
+import {
+  THEME_PRESET_KEYS,
+  THEME_PRESETS,
+  type ThemePreset,
+  useTheme,
+} from "../../src/themes/useTheme.ts";
 import type { JSONSchema } from "../../src/types/jsonSchema.ts";
 import DemoBlock from "../components/DemoBlock.vue";
 import {
   type DemoLocale,
+  type DemoText,
   demoLang,
   setDemoLang,
   demoText as t,
@@ -36,7 +42,7 @@ const translation = ref<Translation>(en);
 provideTranslation(translation);
 
 // ── Theme ──
-const { darkMode, toggleDarkMode } = useTheme();
+const { darkMode, toggleDarkMode, preset, setPreset } = useTheme();
 
 // ── State ──
 const schema = ref<JSONSchema>(exampleSchema);
@@ -244,7 +250,7 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#fafbfd] jscb font-sans">
+  <div class="min-h-screen bg-background jscb font-sans">
 
     <!-- ───────── Hero ───────── -->
     <header class="relative overflow-hidden border-b border-border/30">
@@ -256,25 +262,25 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
             <Code2 :size="20" class="text-white" />
           </div>
           <div>
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">jsonschema-editor</h1>
-            <p class="text-sm text-gray-500 mt-0.5">{{ t.heroSubtitle }}</p>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">jsonschema-editor</h1>
+            <p class="text-sm text-muted-foreground mt-0.5">{{ t.heroSubtitle }}</p>
           </div>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
           <a href="https://www.npmjs.com/package/@fett/jsonschema-editor" target="_blank" rel="nofollow noopener noreferrer"
-             class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border bg-white hover:bg-gray-50 transition-colors shadow-sm">
+             class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border bg-card hover:bg-muted transition-colors shadow-sm">
             <Package :size="14" /> npm
           </a>
           <span class="inline-flex items-center px-2.5 py-1 text-xs font-mono rounded-full bg-primary-50 text-primary-700 border border-primary-100">
             npm i @fett/jsonschema-editor
           </span>
-          <div class="flex items-center gap-0.5 rounded-lg border border-border bg-white p-0.5 shadow-sm">
+          <div class="flex items-center gap-0.5 rounded-lg border border-border bg-card p-0.5 shadow-sm">
             <button v-for="lang in langs" :key="lang.value" type="button" @click="switchLang(lang.value)"
               :class="[
                 'px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
                 currentLang === lang.value
                   ? 'bg-primary-500 text-white shadow-xs'
-                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               ]">
               {{ lang.label }}
             </button>
@@ -292,7 +298,7 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
       <div v-if="mobileNav" class="fixed inset-0 z-20 bg-black/30 lg:hidden" @click="mobileNav = false" />
 
       <aside :class="[
-        'shrink-0 bg-white/60 backdrop-blur-md border-r border-border/30 overflow-y-auto',
+        'shrink-0 bg-card/60 backdrop-blur-md border-r border-border/30 overflow-y-auto',
         'fixed inset-y-0 left-0 z-20 w-64 pt-4 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:w-64',
         mobileNav ? 'translate-x-0' : '-translate-x-full'
       ]">
@@ -303,21 +309,21 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               :class="[
                 'w-full flex items-center gap-2 px-2.5 py-2 rounded-lg font-semibold transition-colors',
                 active === item.id || active.startsWith(item.id + '-')
-                  ? 'text-primary-700 bg-primary-50/80' : 'text-gray-700 hover:bg-gray-100/70'
+                  ? 'text-primary-700 bg-primary-50/80' : 'text-foreground/80 hover:bg-muted/70'
               ]">
               <component v-if="item.icon" :is="item.icon" :size="15" class="opacity-60" />
               <span class="grow text-left">{{ item.label }}</span>
-              <span v-if="item.children" class="p-0.5 rounded hover:bg-gray-200/60" @click.stop="toggle(item.id)">
+              <span v-if="item.children" class="p-0.5 rounded hover:bg-muted/80" @click.stop="toggle(item.id)">
                 <ChevronDown v-if="expanded[item.id]" :size="14" class="opacity-40" />
                 <ChevronRight v-else :size="14" class="opacity-40" />
               </span>
             </button>
             <!-- Children -->
-            <div v-if="item.children && expanded[item.id]" class="ml-6 mt-0.5 space-y-0.5 border-l border-gray-200 pl-2.5">
+            <div v-if="item.children && expanded[item.id]" class="ml-6 mt-0.5 space-y-0.5 border-l border-border pl-2.5">
               <button v-for="child in item.children" :key="child.id" type="button" @click="go(child.id)"
                 :class="[
                   'w-full text-left px-2 py-1.5 rounded-md transition-colors',
-                  active === child.id ? 'text-primary-700 bg-primary-50/60 font-medium' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                  active === child.id ? 'text-primary-700 bg-primary-50/60 font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 ]">
                 {{ child.label }}
               </button>
@@ -338,46 +344,46 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-primary-500 to-cyan-400 flex items-center justify-center">
                 <Layers :size="16" class="text-white" />
               </div>
-              <h2 class="text-xl font-bold text-gray-900">JsonSchemaEditor</h2>
+              <h2 class="text-xl font-bold text-foreground">JsonSchemaEditor</h2>
             </div>
-            <p class="text-gray-500 mb-6 leading-relaxed">
+            <p class="text-muted-foreground mb-6 leading-relaxed">
               {{ t.editorDesc }}
             </p>
 
             <!-- API Tables -->
             <div class="grid gap-5 mb-10">
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.props }}</h3>
-                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
+                <h3 class="text-sm font-semibold text-foreground uppercase tracking-wider mb-2">{{ t.props }}</h3>
+                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card">
                   <table class="w-full text-sm">
-                    <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
+                    <thead><tr class="bg-muted text-left text-xs text-muted-foreground uppercase tracking-wider">
                       <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.type }}</th>
                       <th class="px-4 py-2.5 font-medium">{{ t.default }}</th><th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="p in editorProps" :key="p.name" class="border-t border-border/40">
                         <td class="px-4 py-2.5 font-mono text-xs text-primary-600 font-medium">{{ p.name }}</td>
-                        <td class="px-4 py-2.5 font-mono text-xs text-gray-500">{{ p.type }}</td>
-                        <td class="px-4 py-2.5 font-mono text-xs text-gray-400">{{ p.def }}</td>
-                        <td class="px-4 py-2.5 text-gray-600">{{ p.desc }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">{{ p.type }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground/70">{{ p.def }}</td>
+                        <td class="px-4 py-2.5 text-muted-foreground">{{ p.desc }}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.events }}</h3>
-                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
+                <h3 class="text-sm font-semibold text-foreground uppercase tracking-wider mb-2">{{ t.events }}</h3>
+                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card">
                   <table class="w-full text-sm">
-                    <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
+                    <thead><tr class="bg-muted text-left text-xs text-muted-foreground uppercase tracking-wider">
                       <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.payload }}</th>
                       <th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="e in editorEvents" :key="e.name" class="border-t border-border/40">
                         <td class="px-4 py-2.5 font-mono text-xs text-primary-600 font-medium">{{ e.name }}</td>
-                        <td class="px-4 py-2.5 font-mono text-xs text-gray-500">{{ e.payload }}</td>
-                        <td class="px-4 py-2.5 text-gray-600">{{ e.desc }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">{{ e.payload }}</td>
+                        <td class="px-4 py-2.5 text-muted-foreground">{{ e.desc }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -387,8 +393,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Basic -->
             <div id="section-editor-basic" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.basicTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.basicDesc }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.basicTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.basicDesc }}</p>
               <DemoBlock :code="code['editor-basic']">
                 <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" class="h-full" />
               </DemoBlock>
@@ -396,8 +402,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Visual Only -->
             <div id="section-editor-visual" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.visualOnlyTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.visualOnlyDesc }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.visualOnlyTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.visualOnlyDesc }}</p>
               <DemoBlock :code="code['editor-visual']">
                 <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" :show-json-editor="false" class="h-full" />
               </DemoBlock>
@@ -405,8 +411,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Read-Only -->
             <div id="section-editor-readonly" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.readOnlyTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.readOnlyDesc }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.readOnlyTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.readOnlyDesc }}</p>
               <DemoBlock :code="code['editor-readonly']">
                 <JsonSchemaEditor :schema="schema" :read-only="true" class="h-full" />
               </DemoBlock>
@@ -414,8 +420,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- No Fullscreen -->
             <div id="section-editor-nofs" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.noFullscreenTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.noFullscreenDesc }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.noFullscreenTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.noFullscreenDesc }}</p>
               <DemoBlock :code="code['editor-nofs']">
                 <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" :show-fullscreen="false" class="h-full" />
               </DemoBlock>
@@ -423,13 +429,13 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Textbox Sync -->
             <div id="section-editor-sync" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.syncTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.syncDescA }} <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">update:schema</code> {{ t.syncDescB }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.syncTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.syncDescA }} <code class="text-xs bg-muted px-1 py-0.5 rounded font-mono">update:schema</code> {{ t.syncDescB }}</p>
               <DemoBlock :code="code['editor-sync']">
                 <div class="grid lg:grid-cols-2 gap-4 p-4 h-full">
                   <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" :show-json-editor="false" :show-fullscreen="false" class="h-full" />
                   <textarea :value="schemaText" readonly
-                    class="rounded-xl border border-border/60 bg-white p-4 text-xs font-mono text-gray-600 resize-none shadow-xs focus:outline-none h-full" />
+                    class="rounded-xl border border-border/60 bg-card p-4 text-xs font-mono text-muted-foreground resize-none shadow-xs focus:outline-none h-full" />
                 </div>
               </DemoBlock>
             </div>
@@ -445,45 +451,45 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                 <Sparkles :size="16" class="text-white" />
               </div>
-              <h2 class="text-xl font-bold text-gray-900">SchemaInferencer</h2>
+              <h2 class="text-xl font-bold text-foreground">SchemaInferencer</h2>
             </div>
-            <p class="text-gray-500 mb-6 leading-relaxed">
+            <p class="text-muted-foreground mb-6 leading-relaxed">
               {{ t.inferDesc }}
             </p>
 
             <div class="grid gap-5 mb-10">
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.props }}</h3>
-                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
+                <h3 class="text-sm font-semibold text-foreground uppercase tracking-wider mb-2">{{ t.props }}</h3>
+                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card">
                   <table class="w-full text-sm">
-                    <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
+                    <thead><tr class="bg-muted text-left text-xs text-muted-foreground uppercase tracking-wider">
                       <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.type }}</th>
                       <th class="px-4 py-2.5 font-medium">{{ t.default }}</th><th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="p in inferProps" :key="p.name" class="border-t border-border/40">
                         <td class="px-4 py-2.5 font-mono text-xs text-amber-600 font-medium">{{ p.name }}</td>
-                        <td class="px-4 py-2.5 font-mono text-xs text-gray-500">{{ p.type }}</td>
-                        <td class="px-4 py-2.5 font-mono text-xs text-gray-400">{{ p.def }}</td>
-                        <td class="px-4 py-2.5 text-gray-600">{{ p.desc }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">{{ p.type }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground/70">{{ p.def }}</td>
+                        <td class="px-4 py-2.5 text-muted-foreground">{{ p.desc }}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.events }}</h3>
-                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
+                <h3 class="text-sm font-semibold text-foreground uppercase tracking-wider mb-2">{{ t.events }}</h3>
+                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card">
                   <table class="w-full text-sm">
-                    <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
+                    <thead><tr class="bg-muted text-left text-xs text-muted-foreground uppercase tracking-wider">
                       <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.payload }}</th>
                       <th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="e in inferEvents" :key="e.name" class="border-t border-border/40">
                         <td class="px-4 py-2.5 font-mono text-xs text-amber-600 font-medium">{{ e.name }}</td>
-                        <td class="px-4 py-2.5 font-mono text-xs text-gray-500">{{ e.payload }}</td>
-                        <td class="px-4 py-2.5 text-gray-600">{{ e.desc }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">{{ e.payload }}</td>
+                        <td class="px-4 py-2.5 text-muted-foreground">{{ e.desc }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -493,8 +499,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Popup -->
             <div id="section-infer-popup" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.popupTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.inferPopupDesc }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.popupTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.inferPopupDesc }}</p>
               <DemoBlock :code="code['infer-popup']">
                 <div class="p-4">
                   <button type="button" @click="inferDialogOpen = true"
@@ -502,10 +508,10 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
                     {{ t.openInferencer }}
                   </button>
                   <div v-if="Object.keys((inferPopupSchema as any).properties || {}).length"
-                    class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white" style="height:380px">
+                    class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card" style="height:380px">
                     <JsonSchemaEditor :schema="inferPopupSchema" :read-only="true" class="h-full" />
                   </div>
-                  <p v-else class="text-sm text-gray-400 italic">{{ t.inferredPlaceholder }}</p>
+                  <p v-else class="text-sm text-muted-foreground italic">{{ t.inferredPlaceholder }}</p>
                   <SchemaInferencer :visible="inferDialogOpen" @update:visible="inferDialogOpen = $event" @schema-inferred="inferPopupSchema = $event" />
                 </div>
               </DemoBlock>
@@ -513,17 +519,17 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Inline -->
             <div id="section-infer-inline" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.inlineTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.omitVisibleA }} <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">:visible</code> {{ t.omitVisibleB }} {{ t.inferInlineExtra }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.inlineTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.omitVisibleA }} <code class="text-xs bg-muted px-1 py-0.5 rounded font-mono">:visible</code> {{ t.omitVisibleB }} {{ t.inferInlineExtra }}</p>
               <DemoBlock :code="code['infer-inline']">
                 <div class="grid lg:grid-cols-2 gap-4 p-4">
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.stepPasteJson }}</p>
+                    <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">{{ t.stepPasteJson }}</p>
                     <SchemaInferencer @schema-inferred="inferInlineSchema = $event" />
                   </div>
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.stepResultSchema }}</p>
-                    <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white" style="height:368px">
+                    <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">{{ t.stepResultSchema }}</p>
+                    <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card" style="height:368px">
                       <JsonSchemaEditor :schema="inferInlineSchema" @update:schema="inferInlineSchema = $event" :show-json-editor="false" :show-fullscreen="false" class="h-full" />
                     </div>
                   </div>
@@ -533,19 +539,19 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Utility -->
             <div id="section-infer-util" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.utilityTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.inferUtilDesc }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.utilityTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.inferUtilDesc }}</p>
               <DemoBlock :code="code['infer-util']" language="typescript">
                 <div class="grid lg:grid-cols-2 gap-4 p-4">
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.inputJson }}</p>
-                    <textarea v-model="utilInput" class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono resize-none w-full h-36 focus:outline-none shadow-xs" />
+                    <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">{{ t.inputJson }}</p>
+                    <textarea v-model="utilInput" class="rounded-xl border border-border/60 bg-card p-3 text-xs font-mono resize-none w-full h-36 focus:outline-none shadow-xs" />
                     <button type="button" @click="runInfer"
                       class="mt-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium hover:shadow-md transition-all">{{ t.run }}</button>
                   </div>
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.outputSchema }}</p>
-                    <pre class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono h-36 overflow-auto shadow-xs">{{ utilOutput || t.pressRun }}</pre>
+                    <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">{{ t.outputSchema }}</p>
+                    <pre class="rounded-xl border border-border/60 bg-card p-3 text-xs font-mono h-36 overflow-auto shadow-xs">{{ utilOutput || t.pressRun }}</pre>
                   </div>
                 </div>
               </DemoBlock>
@@ -562,45 +568,45 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
                 <Zap :size="16" class="text-white" />
               </div>
-              <h2 class="text-xl font-bold text-gray-900">JsonValidator</h2>
+              <h2 class="text-xl font-bold text-foreground">JsonValidator</h2>
             </div>
-            <p class="text-gray-500 mb-6 leading-relaxed">
+            <p class="text-muted-foreground mb-6 leading-relaxed">
               {{ t.validatorDesc }}
             </p>
 
             <div class="grid gap-5 mb-10">
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.props }}</h3>
-                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
+                <h3 class="text-sm font-semibold text-foreground uppercase tracking-wider mb-2">{{ t.props }}</h3>
+                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card">
                   <table class="w-full text-sm">
-                    <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
+                    <thead><tr class="bg-muted text-left text-xs text-muted-foreground uppercase tracking-wider">
                       <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.type }}</th>
                       <th class="px-4 py-2.5 font-medium">{{ t.default }}</th><th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="p in validatorProps" :key="p.name" class="border-t border-border/40">
                         <td class="px-4 py-2.5 font-mono text-xs text-emerald-600 font-medium">{{ p.name }}</td>
-                        <td class="px-4 py-2.5 font-mono text-xs text-gray-500">{{ p.type }}</td>
-                        <td class="px-4 py-2.5 font-mono text-xs text-gray-400">{{ p.def }}</td>
-                        <td class="px-4 py-2.5 text-gray-600">{{ p.desc }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">{{ p.type }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground/70">{{ p.def }}</td>
+                        <td class="px-4 py-2.5 text-muted-foreground">{{ p.desc }}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
               <div>
-                <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">{{ t.events }}</h3>
-                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white">
+                <h3 class="text-sm font-semibold text-foreground uppercase tracking-wider mb-2">{{ t.events }}</h3>
+                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card">
                   <table class="w-full text-sm">
-                    <thead><tr class="bg-gray-50/80 text-left text-xs text-gray-500 uppercase tracking-wider">
+                    <thead><tr class="bg-muted text-left text-xs text-muted-foreground uppercase tracking-wider">
                       <th class="px-4 py-2.5 font-medium">{{ t.name }}</th><th class="px-4 py-2.5 font-medium">{{ t.payload }}</th>
                       <th class="px-4 py-2.5 font-medium">{{ t.description }}</th>
                     </tr></thead>
                     <tbody>
                       <tr v-for="e in validatorEvents" :key="e.name" class="border-t border-border/40">
                         <td class="px-4 py-2.5 font-mono text-xs text-emerald-600 font-medium">{{ e.name }}</td>
-                        <td class="px-4 py-2.5 font-mono text-xs text-gray-500">{{ e.payload }}</td>
-                        <td class="px-4 py-2.5 text-gray-600">{{ e.desc }}</td>
+                        <td class="px-4 py-2.5 font-mono text-xs text-muted-foreground">{{ e.payload }}</td>
+                        <td class="px-4 py-2.5 text-muted-foreground">{{ e.desc }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -610,15 +616,15 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Popup -->
             <div id="section-validator-popup" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.popupTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.validatorPopupDesc }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.popupTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.validatorPopupDesc }}</p>
               <DemoBlock :code="code['validator-popup']">
                 <div class="p-4">
                   <button type="button" @click="validatorDialogOpen = true"
                     class="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium hover:shadow-md hover:shadow-emerald-500/20 transition-all">
                     {{ t.openValidator }}
                   </button>
-                  <p class="text-sm text-gray-400 mt-2">{{ t.validatesAgainst }}</p>
+                  <p class="text-sm text-muted-foreground mt-2">{{ t.validatesAgainst }}</p>
                   <JsonValidator :visible="validatorDialogOpen" @update:visible="validatorDialogOpen = $event" :schema="schema" />
                 </div>
               </DemoBlock>
@@ -626,8 +632,8 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Inline -->
             <div id="section-validator-inline" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.inlineTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.omitVisibleA }} <code class="text-xs bg-gray-100 px-1 py-0.5 rounded font-mono">:visible</code> {{ t.omitVisibleB }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.inlineTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.omitVisibleA }} <code class="text-xs bg-muted px-1 py-0.5 rounded font-mono">:visible</code> {{ t.omitVisibleB }}</p>
               <DemoBlock :code="code['validator-inline']">
                 <div class="p-4">
                   <JsonValidator :schema="schema" />
@@ -637,19 +643,19 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
 
             <!-- Utility -->
             <div id="section-validator-util" class="mb-10">
-              <h3 class="text-base font-semibold text-gray-800 mb-1">{{ t.utilityTitle }}</h3>
-              <p class="text-sm text-gray-500 mb-3">{{ t.validatorUtilDesc }}</p>
+              <h3 class="text-base font-semibold text-foreground mb-1">{{ t.utilityTitle }}</h3>
+              <p class="text-sm text-muted-foreground mb-3">{{ t.validatorUtilDesc }}</p>
               <DemoBlock :code="code['validator-util']" language="typescript">
                 <div class="grid lg:grid-cols-2 gap-4 p-4">
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.input }}</p>
-                    <textarea v-model="validUtilInput" class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono resize-none w-full h-36 focus:outline-none shadow-xs" />
+                    <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">{{ t.input }}</p>
+                    <textarea v-model="validUtilInput" class="rounded-xl border border-border/60 bg-card p-3 text-xs font-mono resize-none w-full h-36 focus:outline-none shadow-xs" />
                     <button type="button" @click="runValidate"
                       class="mt-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium hover:shadow-md transition-all">{{ t.validate }}</button>
                   </div>
                   <div>
-                    <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.result }}</p>
-                    <pre class="rounded-xl border border-border/60 bg-white p-3 text-xs font-mono h-36 overflow-auto whitespace-pre-wrap shadow-xs">{{ validUtilOutput || t.pressValidate }}</pre>
+                    <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">{{ t.result }}</p>
+                    <pre class="rounded-xl border border-border/60 bg-card p-3 text-xs font-mono h-36 overflow-auto whitespace-pre-wrap shadow-xs">{{ validUtilOutput || t.pressValidate }}</pre>
                   </div>
                 </div>
               </DemoBlock>
@@ -666,29 +672,29 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                 <Globe :size="16" class="text-white" />
               </div>
-              <h2 class="text-xl font-bold text-gray-900">{{ t.localization }}</h2>
+              <h2 class="text-xl font-bold text-foreground">{{ t.localization }}</h2>
             </div>
-            <p class="text-gray-500 mb-6 leading-relaxed">
+            <p class="text-muted-foreground mb-6 leading-relaxed">
               {{ t.i18nDesc }}
             </p>
 
             <DemoBlock :code="code.i18n">
               <div class="p-4">
                 <div class="mb-4">
-                  <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.availableLocales }}</p>
+                  <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">{{ t.availableLocales }}</p>
                   <div class="flex flex-wrap gap-2">
                     <button v-for="lang in langs" :key="lang.value" type="button" @click="switchLang(lang.value)"
                       :class="[
                         'px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all',
                         currentLang === lang.value
                           ? 'bg-gradient-to-r from-primary-500 to-primary-700 text-white shadow-md shadow-primary-500/20'
-                          : 'bg-white border border-border/60 text-gray-600 hover:bg-gray-50 hover:shadow-xs'
+                          : 'bg-card border border-border/60 text-muted-foreground hover:bg-muted hover:shadow-xs'
                       ]">
                       {{ lang.label }}
                     </button>
                   </div>
                 </div>
-                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white" style="height:380px">
+                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card" style="height:380px">
                   <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" class="h-full" />
                 </div>
               </div>
@@ -705,22 +711,22 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
               <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
                 <Palette :size="16" class="text-white" />
               </div>
-              <h2 class="text-xl font-bold text-gray-900">{{ t.theming }}</h2>
+              <h2 class="text-xl font-bold text-foreground">{{ t.theming }}</h2>
             </div>
-            <p class="text-gray-500 mb-6 leading-relaxed">
+            <p class="text-muted-foreground mb-6 leading-relaxed">
               {{ t.themingDesc }}
             </p>
 
             <DemoBlock :code="code.theming">
               <div class="p-4">
                 <div class="mb-4">
-                  <p class="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">{{ t.darkMode }}</p>
+                  <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">{{ t.darkMode }}</p>
                   <button type="button" @click="toggleDarkMode()"
                     :class="[
                       'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all',
                       darkMode
                         ? 'bg-gray-800 text-yellow-300 shadow-md'
-                        : 'bg-white border border-border/60 text-gray-600 hover:bg-gray-50 hover:shadow-xs'
+                        : 'bg-card border border-border/60 text-muted-foreground hover:bg-muted hover:shadow-xs'
                     ]">
                     <Moon v-if="darkMode" :size="14" />
                     <Sun v-else :size="14" />
@@ -728,7 +734,30 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
                   </button>
                 </div>
 
-                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-white" style="height:350px">
+                <div class="mb-4">
+                  <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">{{ t.colorPreset }}</p>
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      v-for="key in THEME_PRESET_KEYS"
+                      :key="key"
+                      type="button"
+                      @click="setPreset(key as ThemePreset)"
+                      :class="[
+                        'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all',
+                        preset === key
+                          ? 'text-white shadow-md'
+                          : 'bg-card border border-border/60 text-muted-foreground hover:bg-muted hover:shadow-xs'
+                      ]"
+                      :style="preset === key ? { background: THEME_PRESETS[key as ThemePreset].primary } : undefined"
+                    >
+                      <span class="inline-block h-3 w-3 rounded-full"
+                        :style="{ background: THEME_PRESETS[key as ThemePreset].primary }" />
+                      {{ t[key as keyof DemoText] }}
+                    </button>
+                  </div>
+                </div>
+
+                <div class="rounded-xl border border-border/60 overflow-hidden shadow-xs bg-card" style="height:350px">
                   <JsonSchemaEditor :schema="schema" @update:schema="schema = $event" class="h-full" />
                 </div>
               </div>
@@ -736,7 +765,7 @@ import { codeSnippets as code } from "../utils/codeSnippets.ts";
           </section>
 
           <!-- Footer -->
-          <footer class="text-center text-xs text-gray-400 pt-8 pb-12 border-t border-border/20">
+          <footer class="text-center text-xs text-muted-foreground pt-8 pb-12 border-t border-border/20">
             {{ t.footer }}
           </footer>
 

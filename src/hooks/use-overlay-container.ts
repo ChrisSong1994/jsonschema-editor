@@ -2,13 +2,13 @@ import { onScopeDispose, ref } from "vue";
 
 /**
  * Creates and manages a shared overlay container at the <body> level with
- * the `.jscb` class, so PrimeVue overlays (teleported via `appendTo`) live
+ * the `.jscb` class, so Element Plus overlays (teleported via `appendTo`) live
  * at body-level (no clipping) while inheriting all `.jscb`-scoped styles
  * (fonts, colors, design tokens, etc.).
  *
  * Usage:
  *   const { overlayContainer } = useOverlayContainer();
- *   <PSelect :appendTo="overlayContainer" ... />
+ *   <ElSelect :teleported="false" :popper-options="{ fallbackPlacements: [...] }" />
  */
 
 let sharedContainer: HTMLElement | null = null;
@@ -23,7 +23,7 @@ function getOrCreateContainer(): HTMLElement {
     document.body.appendChild(sharedContainer);
 
     // Inject a style so the container itself doesn't interfere
-    // with page layout but its children (PrimeVue overlays) are interactive
+    // with page layout but its children (Element Plus overlays) are interactive
     sharedStyle = document.createElement("style");
     sharedStyle.textContent = [
       "[data-jscb-overlay-container] {",
@@ -57,7 +57,7 @@ export function useOverlayContainer() {
   });
 
   return {
-    /** Pass this to PrimeVue's `appendTo` prop */
+    /** Pass this to Element Plus' `appendTo` prop */
     overlayContainer: container,
   };
 }

@@ -124,8 +124,8 @@ const handleDelete = () => {
       )
     "
     :style="{
-      border: '1px solid var(--p-content-border-color)',
-      borderLeftColor: depth > 0 ? 'var(--p-content-border-color)' : undefined,
+      border: '1px solid var(--el-border-color)',
+      borderLeftColor: depth > 0 ? 'var(--el-border-color)' : undefined,
     }"
   >
     <div class="relative json-field-row justify-between group">
