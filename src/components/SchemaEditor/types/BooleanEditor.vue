@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useId } from "vue";
-import Label from "../../../components/ui/Label.vue";
-import Switch from "../../../components/ui/Switch.vue";
+import { ElFormItem } from "element-plus/es/components/form/index";
+import "element-plus/es/components/form/style/css";
+import { ElSwitch } from "element-plus/es/components/switch/index";
+import "element-plus/es/components/switch/style/css";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import type { ObjectJSONSchema } from "../../../types/jsonSchema.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";
@@ -73,19 +75,20 @@ const hasEnum = () => {
     </p>
     <div v-if="!readOnly || !allowsTrue() || !allowsFalse()" class="space-y-2 pt-2">
       <template v-if="!readOnly || hasEnum()">
-        <Label>{{ t.booleanAllowedValuesLabel }}</Label>
+        <ElFormItem :label="t.booleanAllowedValuesLabel" class="mb-0">
         <div class="space-y-3">
           <div class="flex items-center space-x-2">
-            <Switch :id="allowTrueId" :model-value="allowsTrue()" :disabled="readOnly"
+            <ElSwitch :id="allowTrueId" :model-value="allowsTrue()" :disabled="readOnly"
               @update:model-value="(checked: boolean) => handleAllowedChange(true, checked)" />
-            <Label :for="allowTrueId" class="cursor-pointer">{{ t.booleanAllowTrueLabel }}</Label>
+            <span class="cursor-pointer text-sm">{{ t.booleanAllowTrueLabel }}</span>
           </div>
           <div class="flex items-center space-x-2">
-            <Switch :id="allowFalseId" :model-value="allowsFalse()" :disabled="readOnly"
+            <ElSwitch :id="allowFalseId" :model-value="allowsFalse()" :disabled="readOnly"
               @update:model-value="(checked: boolean) => handleAllowedChange(false, checked)" />
-            <Label :for="allowFalseId" class="cursor-pointer">{{ t.booleanAllowFalseLabel }}</Label>
+            <span class="cursor-pointer text-sm">{{ t.booleanAllowFalseLabel }}</span>
           </div>
         </div>
+        </ElFormItem>
       </template>
       <p v-if="!allowsTrue() && !allowsFalse()" class="text-xs text-amber-600 mt-2">
         {{ t.booleanNeitherWarning }}

@@ -4,8 +4,9 @@ import { ElTag } from "element-plus/es/components/tag/index";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "element-plus/es/components/input-number/style/css";
 import "element-plus/es/components/tag/style/css";
+import { ElButton } from "element-plus/es/components/button/index";
+import "element-plus/es/components/button/style/css";
 import { computed, ref, useId } from "vue";
-import Button from "../../../components/ui/Button.vue";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import type { ObjectJSONSchema } from "../../../types/jsonSchema.ts";
 import {
@@ -292,9 +293,9 @@ const multipleOfValue = computed(() => multipleOf.value ?? null);
           size="small"
           @keydown="($event as KeyboardEvent).key === 'Enter' && handleAddEnumValue()"
         />
-        <Button type="button" @click="handleAddEnumValue()" size="sm" variant="secondary">
+        <ElButton native-type="button" @click="handleAddEnumValue()" size="small">
           {{ t.numberAllowedValuesEnumAddLabel }}
-        </Button>
+        </ElButton>
       </div>
     </div>
   </div>

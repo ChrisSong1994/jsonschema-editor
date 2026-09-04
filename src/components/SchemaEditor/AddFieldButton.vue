@@ -2,12 +2,16 @@
 import ElTooltip from "element-plus/es/components/tooltip/index";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "element-plus/es/components/tooltip/style/css";
+import { ElButton } from "element-plus/es/components/button/index";
+import "element-plus/es/components/button/style/css";
+import { ElDialog } from "element-plus/es/components/dialog/index";
+import "element-plus/es/components/dialog/style/css";
+import { ElInput } from "element-plus/es/components/input/index";
+import "element-plus/es/components/input/style/css";
+import { ElTag } from "element-plus/es/components/tag/index";
+import "element-plus/es/components/tag/style/css";
 import { CirclePlus, HelpCircle, Info } from "lucide-vue-next";
 import { ref, useId } from "vue";
-import Badge from "../../components/ui/Badge.vue";
-import Button from "../../components/ui/Button.vue";
-import Dialog from "../../components/ui/Dialog.vue";
-import InputField from "../../components/ui/InputField.vue";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { useSchemaStore } from "../../hooks/useSchemaStore.ts";
 import type { SchemaType } from "../../types/jsonSchema.ts";
@@ -61,27 +65,27 @@ const handleSubmit = (e: Event) => {
 </script>
 
 <template>
-  <Button
-    type="button"
+  <ElButton
+    native-type="button"
     @click="dialogOpen = true"
-    :variant="variant === 'primary' ? 'default' : 'outline'"
-    size="sm"
+    :plain="variant === 'secondary'"
+    size="small"
     class="flex items-center gap-1.5 group"
   >
     <CirclePlus :size="16" class="group-hover:scale-110 transition-transform" />
     <span>{{ t.fieldAddNewButton }}</span>
-  </Button>
+  </ElButton>
 
-  <Dialog
-    :visible="dialogOpen"
-    @update:visible="dialogOpen = $event"
-    class="md:max-w-[1200px]! max-h-[85vh]! w-[95vw]! p-4! sm:p-6! overflow-auto! jscb"
+  <ElDialog
+    :model-value="dialogOpen"
+    @update:model-value="dialogOpen = $event"
+    class="md:max-w-[1200px]! max-h-[85vh]! w-[95vw]! p-4! sm:p-6! overflow-auto! jscb jsonschema-dialog"
   >
     <template #header>
       <div class="mb-4">
         <div class="text-xl flex flex-wrap items-center gap-2">
           {{ t.fieldAddNewLabel }}
-          <Badge variant="secondary" class="text-xs">{{ t.fieldAddNewBadge }}</Badge>
+          <ElTag class="text-xs">{{ t.fieldAddNewBadge }}</ElTag>
         </div>
         <p class="text-sm text-muted-foreground mt-1">{{ t.fieldAddNewDescription }}</p>
       </div>
@@ -97,7 +101,7 @@ const handleSubmit = (e: Event) => {
                 <Info class="h-4 w-4 text-muted-foreground shrink-0" />
               </ElTooltip>
             </div>
-            <InputField
+            <ElInput
               :id="fieldNameId"
               v-model="fieldName"
               :placeholder="t.fieldNamePlaceholder"
@@ -113,7 +117,7 @@ const handleSubmit = (e: Event) => {
                 <Info class="h-4 w-4 text-muted-foreground shrink-0" />
               </ElTooltip>
             </div>
-            <InputField
+            <ElInput
               :id="fieldDescId"
               v-model="fieldDesc"
               :placeholder="t.fieldDescriptionPlaceholder"
@@ -170,11 +174,11 @@ const handleSubmit = (e: Event) => {
       </div>
 
       <div class="mt-6 gap-2 flex-wrap flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-        <Button type="button" variant="outline" size="sm" @click="dialogOpen = false">
+        <ElButton native-type="button" plain size="small" @click="dialogOpen = false">
           {{ t.fieldAddNewCancel }}
-        </Button>
-        <Button type="submit" size="sm">{{ t.fieldAddNewConfirm }}</Button>
+        </ElButton>
+        <ElButton native-type="submit" size="small">{{ t.fieldAddNewConfirm }}</ElButton>
       </div>
     </form>
-  </Dialog>
+  </ElDialog>
 </template>

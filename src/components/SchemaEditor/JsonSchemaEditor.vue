@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Maximize2 } from "lucide-vue-next";
 import { ref, watch } from "vue";
-import Tabs from "../../components/ui/Tabs.vue";
+import { ElTabPane, ElTabs } from "element-plus/es/components/tabs/index";
+import "element-plus/es/components/tabs/style/css";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import {
   createSchemaStore,
@@ -163,26 +164,22 @@ const handleMouseUp = () => {
             <Maximize2 :size="16" />
           </button>
         </div>
-        <Tabs
+        <ElTabs
           v-model="activeTab"
-          :tabs="[
-            { value: 'visual', label: t.schemaEditorEditModeVisual },
-            { value: 'json', label: t.schemaEditorEditModeJson },
-          ]"
           class="w-full"
         >
-          <template #visual>
+          <ElTabPane name="visual" :label="t.schemaEditorEditModeVisual">
             <div :class="cn('focus:outline-hidden w-full', isFullscreen ? 'h-screen' : 'h-[500px]')">
               <SchemaVisualEditor :read-only="readOnly" />
             </div>
-          </template>
+          </ElTabPane>
 
-          <template #json>
+          <ElTabPane name="json" :label="t.schemaEditorEditModeJson">
             <div :class="cn('focus:outline-hidden w-full', isFullscreen ? 'h-screen' : 'h-[500px]')">
               <JsonSchemaVisualizer />
             </div>
-          </template>
-        </Tabs>
+          </ElTabPane>
+        </ElTabs>
       </div>
 
       <!-- For large screens - show side by side -->

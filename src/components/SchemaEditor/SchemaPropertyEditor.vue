@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronRight, X } from "lucide-vue-next";
 import { computed, ref } from "vue";
-import Badge from "../../components/ui/Badge.vue";
-import ButtonToggle from "../../components/ui/ButtonToggle.vue";
-import InputField from "../../components/ui/InputField.vue";
+import { ElTag } from "element-plus/es/components/tag/index";
+import "element-plus/es/components/tag/style/css";
+import { ElButton } from "element-plus/es/components/button/index";
+import "element-plus/es/components/button/style/css";
+import { ElInput } from "element-plus/es/components/input/index";
+import "element-plus/es/components/input/style/css";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { useSchemaStore } from "../../hooks/useSchemaStore.ts";
 import { cn } from "../../lib/utils.ts";
@@ -144,7 +147,7 @@ const handleDelete = () => {
         <!-- Property name -->
         <div class="flex items-center gap-2 grow min-w-0 overflow-visible">
           <div class="flex items-center gap-2 min-w-0 grow overflow-visible">
-            <InputField
+            <ElInput
               v-if="!readOnly && isEditingName"
               v-model="tempName"
               @blur="handleNameSubmit()"
@@ -164,7 +167,7 @@ const handleDelete = () => {
             </button>
 
             <!-- Description -->
-            <InputField
+            <ElInput
               v-if="!readOnly && isEditingDesc"
               v-model="tempDesc"
               @blur="handleDescSubmit()"
@@ -203,24 +206,26 @@ const handleDelete = () => {
             />
 
             <!-- Required toggle -->
-            <ButtonToggle
+            <ElButton
+              size="small"
+              text
               @click="handleRequiredToggle"
               :class="required ? 'bg-red-500/10 text-red-500' : 'bg-secondary text-muted-foreground'"
             >
               {{ required ? t.propertyRequired : t.propertyOptional }}
-            </ButtonToggle>
+            </ElButton>
           </div>
         </div>
       </div>
 
       <!-- Error badge -->
-      <Badge
+      <ElTag
         v-if="validationNode?.cumulativeChildrenErrors > 0"
+        type="danger"
         class="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums justify-center"
-        variant="destructive"
       >
         {{ validationNode.cumulativeChildrenErrors }}
-      </Badge>
+      </ElTag>
 
       <!-- Delete button -->
       <div v-if="!readOnly" class="flex items-center gap-1 text-muted-foreground">

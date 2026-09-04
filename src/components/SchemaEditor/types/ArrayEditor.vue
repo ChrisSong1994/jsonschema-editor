@@ -2,9 +2,11 @@
 import { ElInputNumber } from "element-plus/es/components/input-number/index";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "element-plus/es/components/input-number/style/css";
+import { ElFormItem } from "element-plus/es/components/form/index";
+import "element-plus/es/components/form/style/css";
+import { ElSwitch } from "element-plus/es/components/switch/index";
+import "element-plus/es/components/switch/style/css";
 import { computed, ref, useId } from "vue";
-import Label from "../../../components/ui/Label.vue";
-import Switch from "../../../components/ui/Switch.vue";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { getArrayItemsSchema } from "../../../lib/schemaEditor.ts";
 import type {
@@ -173,15 +175,14 @@ const maxItemsError = computed(
       </div>
     </div>
 
-    <div v-if="!readOnly || !!uniqueItems" class="flex items-center space-x-2">
-      <Switch :id="uniqueItemsId" :model-value="uniqueItems"
+    <ElFormItem :label="t.arrayForceUniqueItemsLabel" class="mb-0">
+      <ElSwitch :id="uniqueItemsId" :model-value="uniqueItems"
         @update:model-value="(checked: boolean) => { uniqueItems = checked; emit('change', buildValidationProps({ uniqueItems: checked })); }" />
-      <Label :for="uniqueItemsId" class="cursor-pointer">{{ t.arrayForceUniqueItemsLabel }}</Label>
-    </div>
+    </ElFormItem>
 
     <div class="space-y-2 pt-4" :style="(!readOnly || !!minItems || !!maxItems || !!uniqueItems) ? 'border-top: 1px solid var(--el-border-color)' : ''">
       <div class="flex items-center justify-between mb-4">
-        <Label>{{ t.arrayItemTypeLabel }}</Label>
+        <ElFormItem :label="t.arrayItemTypeLabel" class="mb-0" :label-width="'auto'" />
         <TypeDropdown
           :read-only="readOnly"
           :model-value="itemType"

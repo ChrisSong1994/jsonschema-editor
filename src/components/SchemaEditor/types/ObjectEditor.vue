@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { ElButton } from "element-plus/es/components/button/index";
+import "element-plus/es/components/button/style/css";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { useSchemaStore } from "../../../hooks/useSchemaStore.ts";
 import { getSchemaProperties } from "../../../lib/schemaEditor.ts";
 import { isBooleanSchema } from "../../../types/jsonSchema.ts";
 import type { ValidationTreeNode } from "../../../types/validation.ts";
-import ButtonToggle from "../../ui/ButtonToggle.vue";
 import AddFieldButton from "../AddFieldButton.vue";
 import SchemaPropertyEditor from "../SchemaPropertyEditor.vue";
 
@@ -76,7 +77,9 @@ const handleAdditionalPropertiesToggle = () => {
 
     <div v-if="!readOnly" class="mt-4 flex flex-row gap-x-4">
       <AddFieldButton :path="path" variant="secondary" />
-      <ButtonToggle
+      <ElButton
+        size="small"
+        text
         @click="handleAdditionalPropertiesToggle()"
         :class="
           isAdditionalPropertiesForbidden
@@ -85,7 +88,7 @@ const handleAdditionalPropertiesToggle = () => {
         "
       >
         {{ isAdditionalPropertiesForbidden ? t.additionalPropertiesForbid : t.additionalPropertiesAllow }}
-      </ButtonToggle>
+      </ElButton>
     </div>
   </div>
 </template>

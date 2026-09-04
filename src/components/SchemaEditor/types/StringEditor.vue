@@ -4,10 +4,13 @@ import { ElTag } from "element-plus/es/components/tag/index";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "element-plus/es/components/input-number/style/css";
 import "element-plus/es/components/tag/style/css";
+import { ElButton } from "element-plus/es/components/button/index";
+import "element-plus/es/components/button/style/css";
+import { ElInput } from "element-plus/es/components/input/index";
+import "element-plus/es/components/input/style/css";
+import { ElSelect, ElOption } from "element-plus/es/components/select/index";
+import "element-plus/es/components/select/style/css";
 import { computed, ref, useId } from "vue";
-import Button from "../../../components/ui/Button.vue";
-import InputField from "../../../components/ui/InputField.vue";
-import Select from "../../../components/ui/Select.vue";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import type { ObjectJSONSchema } from "../../../types/jsonSchema.ts";
 import {
@@ -203,13 +206,14 @@ const needsDetail = computed(
       <label :for="patternId" :class="['text-sm font-medium', !!patternError && 'text-red-500']">
         {{ t.stringPatternLabel }}
       </label>
-      <InputField
+      <ElInput
         :id="patternId"
         type="text"
         :model-value="String(patternValue)"
         @update:model-value="(v: string) => handleValidationChange('pattern', v || undefined)"
         :placeholder="t.stringPatternPlaceholder"
         size="small"
+        class="w-full"
       />
     </div>
 
@@ -217,12 +221,19 @@ const needsDetail = computed(
       <label :for="formatId" :class="['text-sm font-medium', !!formatError && 'text-red-500']">
         {{ t.stringFormatLabel }}
       </label>
-      <Select
+      <ElSelect
         :id="formatId"
         :model-value="formatValue"
         @update:model-value="(v: string) => handleValidationChange('format', v === 'none' ? undefined : v)"
-        :options="formatOptions"
-      />
+        class="w-full"
+      >
+        <ElOption
+          v-for="opt in formatOptions"
+          :key="opt.value"
+          :label="opt.label"
+          :value="opt.value"
+        />
+      </ElSelect>
     </div>
 
     <div v-if="!readOnly || enumValues.length > 0" class="space-y-2 pt-2 border-t" style="border-color: var(--el-border-color);">
@@ -246,7 +257,7 @@ const needsDetail = computed(
       </div>
 
       <div class="flex items-center gap-2">
-        <InputField
+        <ElInput
           type="text"
           v-model="enumValue"
           :placeholder="t.stringAllowedValuesEnumAddPlaceholder"
@@ -254,14 +265,13 @@ const needsDetail = computed(
           size="small"
           @keydown="$event.key === 'Enter' && handleAddEnumValue()"
         />
-        <Button
-          type="button"
+        <ElButton
+          native-type="button"
           @click="handleAddEnumValue()"
-          size="sm"
-          variant="secondary"
+          size="small"
         >
           {{ t.stringAllowedValuesEnumAddLabel }}
-        </Button>
+        </ElButton>
       </div>
     </div>
   </div>

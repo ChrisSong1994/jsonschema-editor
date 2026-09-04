@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Loader2 } from "lucide-vue-next";
 import { ref, watch } from "vue";
-import Button from "../../components/ui/Button.vue";
-import Dialog from "../../components/ui/Dialog.vue";
+import { ElButton } from "element-plus/es/components/button/index";
+import "element-plus/es/components/button/style/css";
+import { ElDialog } from "element-plus/es/components/dialog/index";
+import "element-plus/es/components/dialog/style/css";
 // biome-ignore lint/style/useImportType: Vue template needs the runtime component import
-import MonacoEditor from "../../components/ui/MonacoEditor.vue";
+import MonacoEditor from "../SchemaEditor/MonacoEditor.vue";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { createSchemaFromJson } from "../../lib/schema-inference.ts";
 import type { JSONSchema } from "../../types/jsonSchema.ts";
@@ -72,11 +74,11 @@ const handleInfer = () => {
 
 <template>
   <!-- Dialog mode (when :visible is provided) -->
-  <Dialog
+  <ElDialog
     v-if="isDialog"
-    :visible="props.visible ?? false"
-    @update:visible="emit('update:visible', $event)"
-    class="md:max-w-[700px]! max-h-[80vh]! w-[95vw]! jscb"
+    :model-value="props.visible ?? false"
+    @update:model-value="emit('update:visible', $event)"
+    class="md:max-w-[700px]! max-h-[80vh]! w-[95vw]! jscb jsonschema-dialog"
   >
     <template #header>
       <div class="mb-2">
@@ -93,16 +95,16 @@ const handleInfer = () => {
       <p v-if="errorMessage" class="text-sm text-red-600">{{ errorMessage }}</p>
 
       <div class="flex justify-end gap-2">
-        <Button variant="outline" size="sm" @click="emit('update:visible', false)">
+        <ElButton size="small" plain @click="emit('update:visible', false)">
           {{ t.inferrerCancel }}
-        </Button>
-        <Button size="sm" @click="handleInfer" :disabled="isProcessing">
+        </ElButton>
+        <ElButton size="small" @click="handleInfer" :disabled="isProcessing">
           <Loader2 v-if="isProcessing" class="animate-spin mr-2" :size="14" />
           {{ t.inferrerGenerate }}
-        </Button>
+        </ElButton>
       </div>
     </div>
-  </Dialog>
+  </ElDialog>
 
   <!-- Inline mode (when :visible is not provided) -->
   <div v-else class="space-y-4 jscb">
@@ -113,10 +115,10 @@ const handleInfer = () => {
     <p v-if="errorMessage" class="text-sm text-red-600">{{ errorMessage }}</p>
 
     <div class="flex justify-end">
-      <Button size="sm" @click="handleInfer" :disabled="isProcessing">
+      <ElButton size="small" @click="handleInfer" :disabled="isProcessing">
         <Loader2 v-if="isProcessing" class="animate-spin mr-2" :size="14" />
         {{ t.inferrerGenerate }}
-      </Button>
+      </ElButton>
     </div>
   </div>
 </template>

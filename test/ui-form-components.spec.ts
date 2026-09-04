@@ -1,19 +1,20 @@
 import { mount } from "@vue/test-utils";
-import ElementPlus from "element-plus";
+import { ElInput, ElSelect, ElSwitch } from "element-plus";
 import { describe, expect, it } from "vitest";
-import InputField from "../src/components/ui/InputField.vue";
-import Select from "../src/components/ui/Select.vue";
-import Switch from "../src/components/ui/Switch.vue";
+
+// These specs cover the Element Plus components that replaced the removed
+// `src/components/ui/*` wrappers (InputField → ElInput, Select → ElSelect +
+// ElOption, Switch → ElSwitch). Component-name coverage preserved.
 
 const globalPlugins = {
   global: {
-    plugins: [ElementPlus],
+    plugins: [],
   },
 };
 
-describe("InputField", () => {
+describe("ElInput (replaces ui/InputField)", () => {
   it("renders with placeholder", () => {
-    const wrapper = mount(InputField, {
+    const wrapper = mount(ElInput, {
       ...globalPlugins,
       props: { placeholder: "Enter text..." },
     });
@@ -23,7 +24,7 @@ describe("InputField", () => {
   });
 
   it("renders with id", async () => {
-    const wrapper = mount(InputField, {
+    const wrapper = mount(ElInput, {
       ...globalPlugins,
       props: { id: "test-input" },
     });
@@ -32,7 +33,7 @@ describe("InputField", () => {
   });
 
   it("renders as disabled", () => {
-    const wrapper = mount(InputField, {
+    const wrapper = mount(ElInput, {
       ...globalPlugins,
       props: { disabled: true },
     });
@@ -40,7 +41,7 @@ describe("InputField", () => {
   });
 
   it("emits update:modelValue on input", async () => {
-    const wrapper = mount(InputField, {
+    const wrapper = mount(ElInput, {
       ...globalPlugins,
       props: { modelValue: "" },
     });
@@ -49,32 +50,27 @@ describe("InputField", () => {
   });
 });
 
-describe("Select", () => {
-  const options = [
-    { label: "English", value: "en" },
-    { label: "中文", value: "zh" },
-  ];
-
+describe("ElSelect (replaces ui/Select)", () => {
   it("renders the component", () => {
-    const wrapper = mount(Select, {
+    const wrapper = mount(ElSelect, {
       ...globalPlugins,
-      props: { options },
+      props: { placeholder: "Choose..." },
     });
     expect(wrapper.exists()).toBe(true);
   });
 
   it("renders with placeholder", () => {
-    const wrapper = mount(Select, {
+    const wrapper = mount(ElSelect, {
       ...globalPlugins,
-      props: { options, placeholder: "Choose..." },
+      props: { placeholder: "Choose..." },
     });
-    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.text()).toContain("Choose...");
   });
 });
 
-describe("Switch", () => {
+describe("ElSwitch (replaces ui/Switch)", () => {
   it("renders the component", () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(ElSwitch, {
       ...globalPlugins,
       props: { modelValue: false },
     });
@@ -82,7 +78,7 @@ describe("Switch", () => {
   });
 
   it("renders with id", () => {
-    const wrapper = mount(Switch, {
+    const wrapper = mount(ElSwitch, {
       ...globalPlugins,
       props: { id: "my-switch", modelValue: true },
     });
