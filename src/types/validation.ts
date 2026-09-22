@@ -1,6 +1,6 @@
 import z from "zod";
-import type { Translation } from "../i18n/translation-keys.ts";
-import { baseSchema, type JSONSchema } from "./jsonSchema.ts";
+import type { zh } from "../constants/zh.ts";
+import { baseSchema, type JSONSchema } from "./json-schema.ts";
 
 function refineRangeConsistency(
   min: number | undefined,
@@ -11,16 +11,27 @@ function refineRangeConsistency(
   if (min !== undefined && max !== undefined && min > max) {
     return false;
   }
-  if (isMinExclusive && isMaxExclusive && max - min < 2) {
+  if (
+    isMinExclusive &&
+    isMaxExclusive &&
+    min !== undefined &&
+    max !== undefined &&
+    max - min < 2
+  ) {
     return false;
   }
-  if ((isMinExclusive || isMaxExclusive) && max - min < 1) {
+  if (
+    (isMinExclusive || isMaxExclusive) &&
+    min !== undefined &&
+    max !== undefined &&
+    max - min < 1
+  ) {
     return false;
   }
   return true;
 }
 
-const getJsonStringType = (t: Translation) =>
+const getJsonStringType = (t: typeof zh) =>
   z
     .object({
       minLength: z
@@ -36,10 +47,10 @@ const getJsonStringType = (t: Translation) =>
       pattern: baseSchema.shape.pattern,
       format: baseSchema.shape.format,
       enum: baseSchema.shape.enum,
-      contentMediaType: baseSchema.shape.contentMediaType, // TODO
-      contentEncoding: baseSchema.shape.contentEncoding, // TODO
+      contentMediaType: baseSchema.shape.contentMediaType, // 暂未做额外约束
+      contentEncoding: baseSchema.shape.contentEncoding, // 暂未做额外约束
     })
-    // If minLength and maxLength are both set, minLength must not be greater than maxLength.
+    // 同时设置 minLength 和 maxLength 时，前者不能大于后者。
     .refine(
       ({ minLength, maxLength }) =>
         refineRangeConsistency(minLength, false, maxLength, false),
@@ -49,7 +60,7 @@ const getJsonStringType = (t: Translation) =>
       },
     );
 
-const getJsonNumberType = (t: Translation) =>
+const getJsonNumberType = (t: typeof zh) =>
   z
     .object({
       multipleOf: z
@@ -62,7 +73,7 @@ const getJsonNumberType = (t: Translation) =>
       exclusiveMaximum: baseSchema.shape.exclusiveMaximum,
       enum: baseSchema.shape.enum,
     })
-    // If both minimum (or exclusiveMinimum) and maximum (or exclusiveMaximum) are set, minimum must not be greater than maximum.
+    // 同时设置最小值（含或排除）和最大值（含或排除）时，最小值不能大于最大值。
     .refine(
       ({ minimum, exclusiveMinimum, maximum, exclusiveMaximum }) =>
         refineRangeConsistency(minimum, false, maximum, false) &&
@@ -74,7 +85,7 @@ const getJsonNumberType = (t: Translation) =>
         path: ["minMax"],
       },
     )
-    // cannot set both exclusiveMinimum and minimum
+    // 不能同时设置 exclusiveMinimum 和 minimum
     .refine(
       ({ minimum, exclusiveMinimum }) =>
         exclusiveMinimum === undefined || minimum === undefined,
@@ -83,7 +94,7 @@ const getJsonNumberType = (t: Translation) =>
         path: ["redundantMinimum"],
       },
     )
-    // cannot set both exclusiveMaximum and maximum
+    // 不能同时设置 exclusiveMaximum 和 maximum
     .refine(
       ({ maximum, exclusiveMaximum }) =>
         exclusiveMaximum === undefined || maximum === undefined,
@@ -92,7 +103,7 @@ const getJsonNumberType = (t: Translation) =>
         path: ["redundantMaximum"],
       },
     )
-    // check that the enums are within min/max if they are set
+    // 设置范围时，检查枚举值是否均位于范围内
     .refine(
       ({
         enum: enumValues,
@@ -119,7 +130,7 @@ const getJsonNumberType = (t: Translation) =>
       },
     );
 
-const getJsonArrayType = (t: Translation) =>
+const getJsonArrayType = (t: typeof zh) =>
   z
     .object({
       minItems: z
@@ -144,7 +155,7 @@ const getJsonArrayType = (t: Translation) =>
         .min(0, { message: t.typeValidationErrorNegativeLength })
         .optional(),
     })
-    // If both minItems and maxItems are set, minItems must not be greater than maxItems.
+    // 同时设置 minItems 和 maxItems 时，前者不能大于后者。
     .refine(
       ({ minItems, maxItems }) =>
         refineRangeConsistency(minItems, false, maxItems, false),
@@ -153,7 +164,7 @@ const getJsonArrayType = (t: Translation) =>
         path: ["minmax"],
       },
     )
-    // If both minContains and maxContains are set, minContains must not be greater than maxContains.
+    // 同时设置 minContains 和 maxContains 时，前者不能大于后者。
     .refine(
       ({ minContains, maxContains }) =>
         refineRangeConsistency(minContains, false, maxContains, false),
@@ -163,7 +174,7 @@ const getJsonArrayType = (t: Translation) =>
       },
     );
 
-const getJsonObjectType = (t: Translation) =>
+const getJsonObjectType = (t: typeof zh) =>
   z
     .object({
       minProperties: z
@@ -177,7 +188,7 @@ const getJsonObjectType = (t: Translation) =>
         .min(0, { message: t.typeValidationErrorNegativeLength })
         .optional(),
     })
-    // If both minProperties and maxProperties are set, minProperties must not be greater than maxProperties.
+    // 同时设置 minProperties 和 maxProperties 时，前者不能大于后者。
     .refine(
       ({ minProperties, maxProperties }) =>
         refineRangeConsistency(minProperties, false, maxProperties, false),
@@ -187,7 +198,7 @@ const getJsonObjectType = (t: Translation) =>
       },
     );
 
-export function getTypeValidation(type: string, t: Translation) {
+export function getTypeValidation(type: string, t: typeof zh) {
   const jsonTypesValidation: Record<string, z.ZodTypeAny> = {
     string: getJsonStringType(t),
     number: getJsonNumberType(t),
@@ -206,7 +217,7 @@ export interface TypeValidationResult {
 export function validateSchemaByType(
   schema: unknown,
   type: string,
-  t: Translation,
+  t: typeof zh,
 ): TypeValidationResult {
   const zodSchema = getTypeValidation(type, t);
   const result = zodSchema.safeParse(schema);
@@ -226,9 +237,9 @@ export interface ValidationTreeNode {
 
 export function buildValidationTree(
   schema: JSONSchema,
-  t: Translation,
+  t: typeof zh,
 ): ValidationTreeNode {
-  // Helper to determine a concrete type string from a schema.type which may be string | string[] | undefined
+  // 从可能为 string、string[] 或 undefined 的 schema.type 中确定具体类型
   const deriveType = (sch: unknown): string | undefined => {
     if (!sch || typeof sch !== "object") return undefined;
     const declared = (sch as Record<string, unknown>).type;
@@ -242,8 +253,8 @@ export function buildValidationTree(
     return undefined;
   };
 
-  // TODO confirm assumption below:
-  // Handle boolean schemas: true => always valid, false => always invalid
+  // 布尔 Schema 的处理约定：
+  // true 表示始终有效，false 表示始终无效
   if (typeof schema === "boolean") {
     const validation: TypeValidationResult =
       schema === true
@@ -271,15 +282,15 @@ export function buildValidationTree(
     return node;
   }
 
-  // schema is an object-shaped JSONSchema
+  // 此处 schema 为对象形式的 JSONSchema
   const sch = schema as Record<string, unknown>;
   const currentType = deriveType(sch);
 
-  const validation = validateSchemaByType(schema, currentType, t);
+  const validation = validateSchemaByType(schema, currentType ?? "unknown", t);
 
   const children: Record<string, ValidationTreeNode> = {};
 
-  // Traverse object properties
+  // 遍历对象属性
   if (currentType === "object") {
     const properties = sch.properties;
     if (properties && typeof properties === "object") {
@@ -289,7 +300,7 @@ export function buildValidationTree(
         children[propName] = buildValidationTree(propSchema, t);
       }
     }
-    // handle dependentSchemas, patternProperties etc. if present (shallow support)
+    // 浅层处理 patternProperties；dependentSchemas 暂未展开
     if (sch.patternProperties && typeof sch.patternProperties === "object") {
       for (const [patternName, patternSchema] of Object.entries(
         sch.patternProperties as Record<string, JSONSchema>,
@@ -302,7 +313,7 @@ export function buildValidationTree(
     }
   }
 
-  // Traverse array items / prefixItems
+  // 遍历数组 items 和 prefixItems
   if (currentType === "array") {
     const items = sch.items;
     if (Array.isArray(items)) {
@@ -320,7 +331,7 @@ export function buildValidationTree(
     }
   }
 
-  // Handle combinators: allOf / anyOf / oneOf / not (shallow traversal)
+  // 浅层遍历组合关键字 allOf、anyOf、oneOf 和 not
   const combinators: Array<"allOf" | "anyOf" | "oneOf"> = [
     "allOf",
     "anyOf",
@@ -342,7 +353,7 @@ export function buildValidationTree(
     children.not = buildValidationTree(sch.not as JSONSchema, t);
   }
 
-  // $defs / definitions / dependentSchemas (shallow)
+  // 浅层遍历 $defs 和 definitions
   if (sch.$defs && typeof sch.$defs === "object") {
     for (const [defName, defSchema] of Object.entries(
       sch.$defs as Record<string, JSONSchema>,
@@ -351,7 +362,7 @@ export function buildValidationTree(
     }
   }
 
-  // definitions is the older name for $defs, so we support both
+  // definitions 是 $defs 的旧称，因此同时兼容
   const definitions = (sch as Record<string, unknown>).definitions;
   if (definitions && typeof definitions === "object") {
     for (const [defName, defSchema] of Object.entries(
@@ -361,7 +372,7 @@ export function buildValidationTree(
     }
   }
 
-  // Compute cumulative error counts (own + all descendants)
+  // 统计当前节点及全部后代的累计错误数
   const ownErrors = validation.success ? 0 : (validation.errors?.length ?? 0);
   const childrenErrors = Object.values(children).reduce(
     (sum, child) => sum + child.cumulativeChildrenErrors,
@@ -369,7 +380,7 @@ export function buildValidationTree(
   );
 
   return {
-    name: currentType,
+    name: currentType ?? "unknown",
     validation,
     children,
     cumulativeChildrenErrors: ownErrors + childrenErrors,

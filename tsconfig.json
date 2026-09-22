@@ -1,15 +1,11 @@
 {
-  "extends": "./tsconfig-base.json",
-  "include": ["vite.config.ts"],
-  "compilerOptions": {
-    "outDir": "build/ts/root"
-  },
+  "files": [],
   "references": [
     {
-      "path": "./src"
+      "path": "./src/tsconfig.json"
     },
     {
-      "path": "./example"
+      "path": "./example/tsconfig.json"
     }
   ]
 }

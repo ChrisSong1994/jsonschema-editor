@@ -4,12 +4,7 @@ import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 
 const isExternalModule = (id: string): boolean =>
-  [
-    "vue",
-    "monaco-editor",
-    "element-plus",
-    /^monaco-editor\//,
-  ].some((entry) =>
+  ["vue", "monaco-editor", "element-plus", /^monaco-editor\//].some((entry) =>
     typeof entry === "string" ? entry === id : entry.test(id),
   ) ||
   // Element Plus JS modules stay external, but style entry points are

@@ -1,37 +1,14 @@
-// Styles
-import "./index.css";
+/** JSON Schema 可视化编辑器公共导出。 */
 
-// Vue components
-
-export { default as JsonValidator } from "./components/features/JsonValidator.vue";
-export { default as SchemaInferencer } from "./components/features/SchemaInferencer.vue";
-export { default as JsonSchemaEditor } from "./components/SchemaEditor/JsonSchemaEditor.vue";
-export { default as JsonSchemaVisualizer } from "./components/SchemaEditor/JsonSchemaVisualizer.vue";
-export { default as SchemaVisualEditor } from "./components/SchemaEditor/SchemaVisualEditor.vue";
-export { useMonacoTheme } from "./hooks/use-monaco-theme.ts";
-// i18n
-export { en } from "./i18n/locales/en.ts";
-export { zh } from "./i18n/locales/zh.ts";
-// Composables
-export {
-  provideTranslation,
-  TranslationKey,
-  useTranslation,
-} from "./i18n/translation-context.ts";
-export type { Translation } from "./i18n/translation-keys.ts";
-// Utilities
+export { default as JsonSchemaSource } from "./components/JsonSchemaSource.vue";
+export { default as JsonValidateDialog } from "./components/JsonValidateDialog.vue";
+export { default as SchemaInferDialog } from "./components/SchemaInferDialog.vue";
+export { default as SchemaVisualEditor } from "./components/SchemaVisualEditor.vue";
+export { default as JsonSchemaEditor } from "./index.vue";
+export type {
+  ValidationError,
+  ValidationResult,
+} from "./lib/json-validator.ts";
+export { findLineNumberForPath, validateJson } from "./lib/json-validator.ts";
 export { createSchemaFromJson, inferSchema } from "./lib/schema-inference.ts";
-// Themes
-export { useTheme, THEME_PRESETS, THEME_PRESET_KEYS } from "./themes/index.ts";
-export type {
-  ThemePreset,
-  ThemePresetDefinition,
-} from "./themes/index.ts";
-// Types
-export type {
-  JSONSchema,
-  NewField,
-  ObjectJSONSchema,
-  SchemaType,
-} from "./types/jsonSchema.ts";
-export { validateJson } from "./utils/jsonValidator.ts";
+export * from "./types/json-schema.ts";

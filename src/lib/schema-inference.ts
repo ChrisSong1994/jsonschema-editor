@@ -1,36 +1,36 @@
-import { asObjectSchema, type JSONSchema } from "../types/jsonSchema.ts";
+import { asObjectSchema, type JSONSchema } from "../types/json-schema.ts";
 
 /**
- * Merges two JSON schemas.
- * If schemas are compatible (e.g., integer and number), attempts to merge.
- * If schemas are identical, returns the first schema.
- * If schemas are incompatible, returns a schema with oneOf.
+ * 合并两个 JSON Schema。
+ * 兼容类型（例如 integer 与 number）会尝试合并。
+ * 两个 Schema 完全相同时返回第一个。
+ * 无法兼容时返回使用 oneOf 的 Schema。
  */
 function mergeSchemas(schema1: JSONSchema, schema2: JSONSchema): JSONSchema {
   const s1 = asObjectSchema(schema1);
   const s2 = asObjectSchema(schema2);
 
-  // Deep comparison for equality
+  // 通过序列化结果进行深度比较
   if (JSON.stringify(s1) === JSON.stringify(s2)) {
     return schema1;
   }
 
-  // Handle basic type merging (e.g., integer into number)
+  // 处理基础类型合并，例如将 integer 合并为 number
   if (s1.type === "integer" && s2.type === "number") return { type: "number" };
   if (s1.type === "number" && s2.type === "integer") return { type: "number" };
 
-  // If types are different or complex merging is needed, use oneOf
+  // 类型不同或需要复杂合并时使用 oneOf
   const existingOneOf = Array.isArray(s1.oneOf) ? s1.oneOf : [s1];
   const newSchemaToAdd = s2;
 
-  // Avoid adding duplicate schemas to oneOf
+  // 避免向 oneOf 添加重复 Schema
   if (
     !existingOneOf.some(
       (s) => JSON.stringify(s) === JSON.stringify(newSchemaToAdd),
     )
   ) {
     const mergedOneOf = [...existingOneOf, newSchemaToAdd];
-    // Simplify oneOf if it contains only one unique schema after potential merge attempts
+    // 合并后仅剩一个唯一 Schema 时简化 oneOf
     const uniqueSchemas = [
       ...new Map(mergedOneOf.map((s) => [JSON.stringify(s), s])).values(),
     ];
@@ -40,17 +40,17 @@ function mergeSchemas(schema1: JSONSchema, schema2: JSONSchema): JSONSchema {
     return { oneOf: uniqueSchemas };
   }
 
-  return s1.oneOf ? s1 : { oneOf: [s1] }; // Return existing oneOf or create new if only s1 existed
+  return s1.oneOf ? s1 : { oneOf: [s1] }; // 保留已有 oneOf，否则创建新的
 }
 
-// --- Helper Functions for Type Inference ---
+// --- 类型推断辅助函数 ---
 
 function inferObjectSchema(obj: Record<string, unknown>): JSONSchema {
   const properties: Record<string, JSONSchema> = {};
   const required: string[] = [];
 
   for (const [key, value] of Object.entries(obj)) {
-    properties[key] = inferSchema(value); // Recursive call
+    properties[key] = inferSchema(value); // 递归推断
     if (value !== undefined && value !== null) {
       required.push(key);
     }
@@ -59,7 +59,7 @@ function inferObjectSchema(obj: Record<string, unknown>): JSONSchema {
   return {
     type: "object",
     properties,
-    required: required.length > 0 ? required.sort() : undefined, // Sort required keys
+    required: required.length > 0 ? required.sort() : undefined, // 对必填字段排序
   };
 }
 
@@ -69,12 +69,12 @@ function detectEnumsInArrayItems(
   totalItems: number,
 ): Record<string, JSONSchema> {
   if (totalItems < 10 || Object.keys(mergedProperties).length === 0) {
-    return mergedProperties; // Not enough data or no properties to check
+    return mergedProperties; // 数据不足或没有可检查的属性
   }
 
   const valueMap: Record<string, Set<string | number>> = {};
 
-  // Collect distinct values
+  // 收集去重后的值
   for (const item of originalArray) {
     for (const key in mergedProperties) {
       if (Object.prototype.hasOwnProperty.call(item, key)) {
@@ -88,7 +88,7 @@ function detectEnumsInArrayItems(
   }
 
   const updatedProperties = { ...mergedProperties };
-  // Update schema for properties that look like enums
+  // 为疑似枚举的属性更新 Schema
   for (const key in valueMap) {
     const distinctValues = Array.from(valueMap[key]);
     if (
@@ -121,12 +121,15 @@ function detectSemanticFormatsInArrayItems(
   for (const key in updatedProperties) {
     const currentSchema = asObjectSchema(updatedProperties[key]);
 
-    // Coordinates Detection
+    // 坐标格式识别
     if (
       /coordinates?|coords?|latLon|lonLat|point/i.test(key) &&
       currentSchema.type === "array"
     ) {
-      const itemsSchema = asObjectSchema(currentSchema.items);
+      const itemsSchema =
+        currentSchema.items === undefined
+          ? undefined
+          : asObjectSchema(currentSchema.items);
       if (itemsSchema?.type === "number" || itemsSchema?.type === "integer") {
         let isValidCoordArray = true;
         let coordLength: number | null = null;
@@ -161,7 +164,7 @@ function detectSemanticFormatsInArrayItems(
       }
     }
 
-    // Timestamp Detection
+    // 时间戳格式识别
     if (
       /timestamp|createdAt|updatedAt|occurredAt/i.test(key) &&
       currentSchema.type === "integer"
@@ -186,11 +189,11 @@ function detectSemanticFormatsInArrayItems(
         updatedProperties[key] = {
           type: "integer",
           format: "unix-timestamp",
-          description: "Unix timestamp (likely milliseconds)",
+          description: "Unix 时间戳（可能为毫秒）",
         };
       }
     }
-    // Add more semantic detections here
+    // 后续可在此扩展更多语义识别
   }
   return updatedProperties;
 }
@@ -220,14 +223,14 @@ function processArrayOfObjects(
     .filter(([_, count]) => count === totalItems)
     .map(([key, _]) => key);
 
-  // Apply Enum Detection
+  // 应用枚举识别
   mergedProperties = detectEnumsInArrayItems(
     mergedProperties,
     originalArray,
     totalItems,
   );
 
-  // Apply Semantic Detection
+  // 应用语义格式识别
   mergedProperties = detectSemanticFormatsInArrayItems(
     mergedProperties,
     originalArray,
@@ -243,7 +246,7 @@ function processArrayOfObjects(
 function inferArraySchema(obj: unknown[]): JSONSchema {
   if (obj.length === 0) return { type: "array", items: {} };
 
-  const itemSchemas = obj.map((item) => inferSchema(item)); // Recursive call
+  const itemSchemas = obj.map((item) => inferSchema(item)); // 递归推断
 
   const firstItemSchema = asObjectSchema(itemSchemas[0]);
   const allSameType = itemSchemas.every(
@@ -259,7 +262,7 @@ function inferArraySchema(obj: unknown[]): JSONSchema {
       return {
         type: "array",
         items: itemsSchema,
-        minItems: 0, // Keep minItems consistent
+        minItems: 0, // 保持 minItems 一致
       };
     }
     return {
@@ -269,12 +272,12 @@ function inferArraySchema(obj: unknown[]): JSONSchema {
     };
   }
 
-  // Mixed type arrays
+  // 混合类型数组
   const uniqueSchemas = [
     ...new Map(itemSchemas.map((s) => [JSON.stringify(s), s])).values(),
   ];
 
-  // Check if merged schemas result in a single object type
+  // 检查合并后的 Schema 是否只包含单一对象类型
   if (
     uniqueSchemas.length === 1 &&
     asObjectSchema(uniqueSchemas[0]).type === "object"
@@ -317,11 +320,11 @@ function inferNumberSchema(num: number): JSONSchema {
   return Number.isInteger(num) ? { type: "integer" } : { type: "number" };
 }
 
-// --- Main Inference Function ---
+// --- 主推断函数 ---
 
 /**
- * Infers a JSON Schema from a JSON object
- * Based on json-schema-generator approach
+ * 根据 JSON 对象推断 JSON Schema
+ * 参考 json-schema-generator 的推断策略
  */
 export function inferSchema(obj: unknown): JSONSchema {
   if (obj === null) return { type: "null" };
@@ -330,33 +333,33 @@ export function inferSchema(obj: unknown): JSONSchema {
 
   switch (type) {
     case "object":
-      return inferObjectSchema(obj as Record<string, unknown>); // Cast needed
+      return inferObjectSchema(obj as Record<string, unknown>); // 此处已完成对象类型判断
     case "array":
-      return inferArraySchema(obj as unknown[]); // Cast needed
+      return inferArraySchema(obj as unknown[]); // 此处已完成数组类型判断
     case "string":
       return inferStringSchema(obj as string);
     case "number":
       return inferNumberSchema(obj as number);
     case "boolean":
-      return { type: "boolean" }; // Simple enough to keep inline
+      return { type: "boolean" }; // 简单类型直接返回
     default:
-      // Should not happen for valid JSON, but return empty schema as fallback
+      // 合法 JSON 不应进入此分支，返回空 Schema 作为兜底
       return {};
   }
 }
 
 /**
- * Creates a full JSON Schema document from a JSON object
+ * 根据 JSON 对象创建完整的 JSON Schema 文档
  */
 export function createSchemaFromJson(jsonObject: unknown): JSONSchema {
   const inferredSchema = inferSchema(jsonObject);
 
-  // Ensure the root schema is always an object, even if input is array/primitive
+  // 即使输入是数组或基础类型，也保证根 Schema 为对象
   const rootSchema = asObjectSchema(inferredSchema);
   const finalSchema: Record<string, unknown> = {
     $schema: "https://json-schema.org/draft-07/schema",
-    title: "Generated Schema",
-    description: "Generated from JSON data",
+    title: "生成的 Schema",
+    description: "根据 JSON 数据生成",
   };
 
   if (rootSchema.type === "object" || rootSchema.properties) {
@@ -371,16 +374,15 @@ export function createSchemaFromJson(jsonObject: unknown): JSONSchema {
     if (rootSchema.maxItems !== undefined)
       finalSchema.maxItems = rootSchema.maxItems;
   } else if (rootSchema.type) {
-    // Handle primitive types at the root (e.g., input is just "hello")
-    // This might be less common, but good to handle. Wrap it in an object.
+    // 处理根节点为基础类型的情况，例如输入仅为 "hello"
+    // 此类输入较少见，但仍将其包装为对象以保持编辑器结构一致。
     finalSchema.type = "object";
     finalSchema.properties = { value: rootSchema };
     finalSchema.required = ["value"];
-    finalSchema.title = "Generated Schema (Primitive Root)";
-    finalSchema.description =
-      "Input was a primitive value, wrapped in an object.";
+    finalSchema.title = "生成的 Schema（基础类型根节点）";
+    finalSchema.description = "输入为基础类型，已包装为对象。";
   } else {
-    // Default empty object if inference fails completely
+    // 完全无法推断时使用空对象 Schema
     finalSchema.type = "object";
   }
 

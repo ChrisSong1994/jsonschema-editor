@@ -2,7 +2,7 @@
   "name": "@fett/jsonschema-editor",
   "license": "MIT",
   "description": "Vue 3 Visual JSON Schema editor for creating and manipulating JSON Schema definitions with an intuitive interface.",
-   "author": "chrissong1994 <18557511748@163.com>",
+  "author": "chrissong1994 <18557511748@163.com>",
   "keywords": [
     "json",
     "schema",
@@ -40,25 +40,19 @@
     "format": "biome format . --write",
     "check": "biome check .",
     "fix": "biome check --fix --unsafe",
-    "typecheck": "vue-tsc --noEmit",
-    "test": "tsx --tsconfig tsconfig.test.json --test test/**/*.test.{js,ts}",
-    "test:ui": "vitest run",
-    "test:all": "pnpm run test && pnpm run test:ui",
-    "test:snapshots": "tsx --test-update-snapshots --tsconfig tsconfig.test.json --test test/**/*.test.{js,ts}",
+    "typecheck": "vue-tsc --noEmit -p src/tsconfig.typecheck.json && vue-tsc --noEmit -p example/tsconfig.typecheck.json",
     "prepack": "pnpm run build"
   },
   "dependencies": {
+    "@lucide/vue": "^1.47.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "clsx": "^2.1.1",
-    "lucide-vue-next": "^0.562.0",
-    "tailwind-merge": "^3.3.1",
     "zod": "^4.0.17"
   },
   "peerDependencies": {
-    "vue": ">=3.4.0",
     "element-plus": ">=2.10.0",
-    "monaco-editor": ">=0.44.0"
+    "monaco-editor": ">=0.44.0",
+    "vue": ">=3.4.0"
   },
   "peerDependenciesMeta": {
     "monaco-editor": {
@@ -67,21 +61,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.10",
-    "@tailwindcss/postcss": "^4.1.12",
     "@types/node": "^25.0.3",
     "@vitejs/plugin-vue": "^6.0.4",
-    "@vue/test-utils": "^2.4.6",
     "element-plus": "^2.14.5",
-    "happy-dom": "^20.8.3",
-    "highlight.js": "^11.11.1",
     "monaco-editor": "^0.55.1",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.12",
     "tsx": "^4.20.6",
     "typescript": "^5.9.2",
     "vite": "^6.4.1",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "^4.0.18",
     "vue": "^3.5.0",
     "vue-router": "^4.5.0",
     "vue-tsc": "^2.2.0"

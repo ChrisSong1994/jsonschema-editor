@@ -1,10 +1,12 @@
 {
   "extends": "../tsconfig-base.json",
   "compilerOptions": {
-    "composite": true,
-    "noEmit": false,
-    "outDir": "../build/ts/example",
-    "types": ["vite/client"]
+    "noEmit": true,
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../src/*"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.vue", "env.d.ts"]
 }
