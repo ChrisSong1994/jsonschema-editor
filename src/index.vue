@@ -1,25 +1,28 @@
 <script setup lang="ts">
-import { Maximize2 } from "@lucide/vue";
-import { ElButton } from "element-plus/es/components/button/index";
-import "element-plus/es/components/button/style/css";
+import { Maximize2, PanelRightClose, PanelRightOpen } from "@lucide/vue";
+import { ElButton, ElTabPane, ElTabs } from "element-plus";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import JsonSchemaSource from "./components/JsonSchemaSource.vue";
 import SchemaVisualEditor from "./components/SchemaVisualEditor.vue";
+import { t } from "./composables/useI18n.ts";
 import {
   createSchemaStore,
   provideSchemaStore,
 } from "./composables/useSchemaStore.ts";
-import { zh as t } from "./constants/zh.ts";
 import type { JSONSchema } from "./types/json-schema.ts";
 
 /** JsonSchemaEditor 对外属性。 */
 export interface JsonSchemaEditorProps {
   schema?: JSONSchema;
   readOnly?: boolean;
-  /** 是否显示 JSON 源码编辑面板。 */
+  /** 是否显示 JSON 源码编辑面板（双栏/Tab 模式开关）。 */
   showJsonEditor?: boolean;
   /** 是否显示全屏切换按钮。 */
   showFullscreen?: boolean;
+  /** 是否显示源代码面板切换按钮。 */
+  showSourceToggle?: boolean;
+  /** JSON 源代码面板是否可见，支持 v-model:source-visible。 */
+  sourceVisible?: boolean;
   class?: string;
 }
 
@@ -28,10 +31,13 @@ const props = withDefaults(defineProps<JsonSchemaEditorProps>(), {
   readOnly: false,
   showJsonEditor: true,
   showFullscreen: true,
+  showSourceToggle: true,
+  sourceVisible: true,
 });
 
 const emit = defineEmits<{
   "update:schema": [schema: JSONSchema];
+  "update:sourceVisible": [visible: boolean];
 }>();
 
 // Store 是唯一数据源。emit 延迟到下一个宏任务，避免父组件回写触发同步循环。
@@ -74,6 +80,25 @@ const leftPanelWidth = ref(50);
 const containerRef = ref<HTMLDivElement | null>(null);
 const isDragging = ref(false);
 const activeTab = ref("visual");
+const isSourceVisible = ref(props.sourceVisible);
+
+const isVisualOnly = computed(
+  () => !props.showJsonEditor || !isSourceVisible.value,
+);
+
+watch(
+  () => props.sourceVisible,
+  (visible) => {
+    isSourceVisible.value = visible;
+    activeTab.value = visible ? "json" : "visual";
+  },
+);
+
+const toggleSourceVisible = () => {
+  isSourceVisible.value = !isSourceVisible.value;
+  activeTab.value = isSourceVisible.value ? "json" : "visual";
+  emit("update:sourceVisible", isSourceVisible.value);
+};
 
 const containerClass = computed(() => [
   "json-schema-editor",
@@ -124,19 +149,30 @@ onBeforeUnmount(() => {
 
 <template>
   <div :class="containerClass">
-    <template v-if="!showJsonEditor">
+    <template v-if="isVisualOnly">
       <div class="json-schema-editor__panel">
         <div class="json-schema-editor__header">
           <h3>{{ t.schemaEditorTitle }}</h3>
-          <el-button
-            v-if="showFullscreen"
-            text
-            circle
-            :aria-label="t.schemaEditorToggleFullscreen"
-            @click="toggleFullscreen"
-          >
-            <Maximize2 :size="16" />
-          </el-button>
+          <div class="json-schema-editor__header-actions">
+            <ElButton
+              v-if="showSourceToggle && showJsonEditor"
+              text
+              circle
+              :aria-label="t.schemaEditorShowSource"
+              @click="toggleSourceVisible"
+            >
+              <PanelRightOpen :size="16" />
+            </ElButton>
+            <ElButton
+              v-if="showFullscreen"
+              text
+              circle
+              :aria-label="t.schemaEditorToggleFullscreen"
+              @click="toggleFullscreen"
+            >
+              <Maximize2 :size="16" />
+            </ElButton>
+          </div>
         </div>
         <div class="json-schema-editor__body">
           <SchemaVisualEditor :read-only="readOnly" />
@@ -148,42 +184,77 @@ onBeforeUnmount(() => {
       <div class="json-schema-editor__mobile">
         <div class="json-schema-editor__header">
           <h3>{{ t.schemaEditorTitle }}</h3>
-          <el-button
-            v-if="showFullscreen"
-            text
-            circle
-            :aria-label="t.schemaEditorToggleFullscreen"
-            @click="toggleFullscreen"
-          >
-            <Maximize2 :size="16" />
-          </el-button>
+          <div class="json-schema-editor__header-actions">
+            <ElButton
+              v-if="showSourceToggle"
+              text
+              circle
+              :aria-label="
+                isSourceVisible
+                  ? t.schemaEditorHideSource
+                  : t.schemaEditorShowSource
+              "
+              @click="toggleSourceVisible"
+            >
+              <PanelRightClose v-if="isSourceVisible" :size="16" />
+              <PanelRightOpen v-else :size="16" />
+            </ElButton>
+            <ElButton
+              v-if="showFullscreen"
+              text
+              circle
+              :aria-label="t.schemaEditorToggleFullscreen"
+              @click="toggleFullscreen"
+            >
+              <Maximize2 :size="16" />
+            </ElButton>
+          </div>
         </div>
-        <el-tabs v-model="activeTab" class="json-schema-editor__tabs">
-          <el-tab-pane :label="t.schemaEditorEditModeVisual" name="visual">
+        <ElTabs v-model="activeTab" class="json-schema-editor__tabs">
+          <ElTabPane :label="t.schemaEditorEditModeVisual" name="visual">
             <div class="json-schema-editor__tab-body">
               <SchemaVisualEditor :read-only="readOnly" />
             </div>
-          </el-tab-pane>
-          <el-tab-pane :label="t.schemaEditorEditModeJson" name="json">
+          </ElTabPane>
+          <ElTabPane
+            :label="t.schemaEditorEditModeJson"
+            name="json"
+          >
             <div class="json-schema-editor__tab-body">
               <JsonSchemaSource :read-only="readOnly" />
             </div>
-          </el-tab-pane>
-        </el-tabs>
+          </ElTabPane>
+        </ElTabs>
       </div>
 
       <div ref="containerRef" class="json-schema-editor__desktop">
         <div class="json-schema-editor__header">
           <h3>{{ t.schemaEditorTitle }}</h3>
-          <el-button
-            v-if="showFullscreen"
-            text
-            circle
-            :aria-label="t.schemaEditorToggleFullscreen"
-            @click="toggleFullscreen"
-          >
-            <Maximize2 :size="16" />
-          </el-button>
+          <div class="json-schema-editor__header-actions">
+            <ElButton
+              v-if="showSourceToggle"
+              text
+              circle
+              :aria-label="
+                isSourceVisible
+                  ? t.schemaEditorHideSource
+                  : t.schemaEditorShowSource
+              "
+              @click="toggleSourceVisible"
+            >
+              <PanelRightClose v-if="isSourceVisible" :size="16" />
+              <PanelRightOpen v-else :size="16" />
+            </ElButton>
+            <ElButton
+              v-if="showFullscreen"
+              text
+              circle
+              :aria-label="t.schemaEditorToggleFullscreen"
+              @click="toggleFullscreen"
+            >
+              <Maximize2 :size="16" />
+            </ElButton>
+          </div>
         </div>
         <div class="json-schema-editor__split">
           <div class="json-schema-editor__pane" :style="panelStyle">
@@ -252,6 +323,12 @@ onBeforeUnmount(() => {
   font-weight: 600;
 }
 
+.json-schema-editor__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .json-schema-editor__body,
 .json-schema-editor__tab-body,
 .json-schema-editor__split {
@@ -292,7 +369,7 @@ onBeforeUnmount(() => {
 
 .json-schema-editor__divider {
   flex-shrink: 0;
-  width: 4px;
+  width: 2px;
   background: var(--el-border-color);
   cursor: col-resize;
   transition: background-color 0.2s;

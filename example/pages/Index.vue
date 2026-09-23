@@ -4,16 +4,19 @@ import {
   Eye,
   EyeOff,
   FileJson,
+  Languages,
   Layers,
   Lock,
   Maximize,
   Moon,
+  PanelRight,
   Sparkles,
   Sun,
   Zap,
 } from "@lucide/vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { isDark, toggleDark } from "../../src/composables/useDarkMode.ts";
+import { locale, t, toggleLocale } from "../../src/composables/useI18n.ts";
 import {
   type JSONSchema,
   JsonSchemaEditor,
@@ -43,6 +46,11 @@ const inferDialogVisible = ref(false);
 const validateDialogVisible = ref(false);
 
 const showInferred = ref(false);
+
+const isZh = computed(() => locale.value === "zh");
+const langLabel = computed(() => (isZh.value ? "English" : "中文"));
+
+const propSourceVisible = ref(false);
 </script>
 
 <template>
@@ -54,24 +62,38 @@ const showInferred = ref(false);
         </div>
         <div>
           <h1>jsonschema-editor</h1>
-          <p>基于 Vue 3 + Element Plus 的可视化 JSON Schema 编辑器</p>
+          <p>{{ t.demoSubtitle }}</p>
         </div>
       </div>
-      <button type="button" class="demo-icon-btn" @click="toggleDark()">
-        <Moon v-if="!isDark" :size="18" />
-        <Sun v-else :size="18" />
-      </button>
+      <div class="demo-header__actions">
+        <button
+          type="button"
+          class="demo-lang-btn"
+          :title="langLabel"
+          @click="toggleLocale()"
+        >
+          <Languages :size="16" />
+          <span>{{ langLabel }}</span>
+        </button>
+        <button
+          type="button"
+          class="demo-icon-btn"
+          @click="toggleDark()"
+        >
+          <Moon v-if="!isDark" :size="18" />
+          <Sun v-else :size="18" />
+        </button>
+      </div>
     </header>
 
     <main class="demo-main">
-      <!-- 基础用法 -->
       <section class="demo-section">
         <div class="demo-section__title">
           <Layers :size="18" />
-          <h2>基础用法</h2>
+          <h2>{{ t.demoBasicTitle }}</h2>
         </div>
         <p class="demo-section__desc">
-          左侧可视化编辑，右侧实时 JSON 源码，支持拖拽分割条与全屏。
+          {{ t.demoBasicDesc }}
         </p>
         <JsonSchemaEditor
           :schema="schema"
@@ -79,50 +101,88 @@ const showInferred = ref(false);
         />
       </section>
 
-      <!-- 配置选项 -->
+      <section class="demo-section">
+        <div class="demo-section__title">
+          <PanelRight :size="18" />
+          <h2>{{ t.demoToggleSourceTitle }}</h2>
+        </div>
+        <p class="demo-section__desc">
+          {{ t.demoToggleSourceDesc }}
+        </p>
+        <JsonSchemaEditor
+          :schema="schema"
+          @update:schema="schema = $event"
+        />
+      </section>
+
       <section class="demo-section">
         <div class="demo-section__title">
           <Eye :size="18" />
-          <h2>纯可视化模式</h2>
+          <h2>{{ t.demoPropSourceTitle }}</h2>
         </div>
         <p class="demo-section__desc">
-          设置 <code>show-json-editor="false"</code>，仅展示可视化面板。
+          {{ t.demoPropSourceDesc }}
+        </p>
+        <div class="demo-actions">
+          <button
+            type="button"
+            class="demo-btn demo-btn--primary"
+            @click="propSourceVisible = !propSourceVisible"
+          >
+            <Eye v-if="!propSourceVisible" :size="15" />
+            <EyeOff v-else :size="15" />
+            {{
+              propSourceVisible ? t.demoHideSource : t.demoShowSource
+            }}
+          </button>
+        </div>
+        <JsonSchemaEditor
+          :schema="schema"
+          v-model:source-visible="propSourceVisible"
+          @update:schema="schema = $event"
+        />
+      </section>
+
+      <section class="demo-section">
+        <div class="demo-section__title">
+          <Eye :size="18" />
+          <h2>{{ t.demoVisualOnlyTitle }}</h2>
+        </div>
+        <p class="demo-section__desc">
+          {{ t.demoVisualOnlyDesc }}
         </p>
         <JsonSchemaEditor :schema="schema" :show-json-editor="false" />
       </section>
 
-      <section class="demo-grid">
-        <div class="demo-section">
-          <div class="demo-section__title">
-            <Lock :size="18" />
-            <h2>只读模式</h2>
-          </div>
-          <p class="demo-section__desc">
-            设置 <code>read-only</code>，禁止一切编辑操作。
-          </p>
-          <JsonSchemaEditor :schema="schema" :read-only="true" />
+      <section class="demo-section">
+        <div class="demo-section__title">
+          <Lock :size="18" />
+          <h2>{{ t.demoReadonlyTitle }}</h2>
         </div>
-
-        <div class="demo-section">
-          <div class="demo-section__title">
-            <Maximize :size="18" />
-            <h2>隐藏全屏按钮</h2>
-          </div>
-          <p class="demo-section__desc">
-            设置 <code>show-fullscreen="false"</code>。
-          </p>
-          <JsonSchemaEditor :schema="schema" :show-fullscreen="false" />
-        </div>
+        <p class="demo-section__desc">
+          {{ t.demoReadonlyDesc }}
+        </p>
+        <JsonSchemaEditor :schema="schema" :read-only="true" />
       </section>
 
-      <!-- Schema 推断 -->
+      <section class="demo-section">
+        <div class="demo-section__title">
+          <Maximize :size="18" />
+          <h2>{{ t.demoNoFullscreenTitle }}</h2>
+        </div>
+        <p class="demo-section__desc">
+          {{ t.demoNoFullscreenDesc }}
+        </p>
+        <JsonSchemaEditor :schema="schema" :show-fullscreen="false" />
+      </section>
+
       <section class="demo-section">
         <div class="demo-section__title">
           <Sparkles :size="18" />
-          <h2>从 JSON 推断 Schema</h2>
+          <h2>{{ t.demoInferTitle }}</h2>
         </div>
         <p class="demo-section__desc">
-          粘贴 JSON 数据，一键生成对应的 JSON Schema。
+          {{ t.demoInferDesc }}
         </p>
         <div class="demo-actions">
           <button
@@ -130,7 +190,7 @@ const showInferred = ref(false);
             class="demo-btn demo-btn--primary"
             @click="inferDialogVisible = true"
           >
-            <Eye :size="15" /> 弹窗模式
+            <Eye :size="15" /> {{ t.demoDialogMode }}
           </button>
           <button
             type="button"
@@ -138,14 +198,13 @@ const showInferred = ref(false);
             :class="{ 'demo-btn--active': showInferred }"
             @click="showInferred = !showInferred"
           >
-            <EyeOff :size="15" /> {{ showInferred ? "收起内联" : "内联模式" }}
+            <EyeOff :size="15" />
+            {{ showInferred ? t.demoCollapseInline : t.demoInlineMode }}
           </button>
         </div>
 
         <div v-if="showInferred" class="demo-infer-inline">
-          <SchemaInferDialog
-            @schema-inferred="inferredSchema = $event"
-          />
+          <SchemaInferDialog @schema-inferred="inferredSchema = $event" />
         </div>
 
         <SchemaInferDialog
@@ -155,14 +214,13 @@ const showInferred = ref(false);
         />
       </section>
 
-      <!-- JSON 校验 -->
       <section class="demo-section">
         <div class="demo-section__title">
           <Zap :size="18" />
-          <h2>JSON 数据校验</h2>
+          <h2>{{ t.demoValidateTitle }}</h2>
         </div>
         <p class="demo-section__desc">
-          基于 Ajv，使用当前 Schema 校验 JSON 数据。
+          {{ t.demoValidateDesc }}
         </p>
         <div class="demo-actions">
           <button
@@ -170,7 +228,7 @@ const showInferred = ref(false);
             class="demo-btn demo-btn--primary"
             @click="validateDialogVisible = true"
           >
-            <FileJson :size="15" /> 打开校验弹窗
+            <FileJson :size="15" /> {{ t.demoOpenValidator }}
           </button>
         </div>
         <JsonValidateDialog
@@ -197,6 +255,7 @@ const showInferred = ref(false);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: 20px 32px;
   border-bottom: 1px solid var(--el-border-color-lighter);
   background: var(--el-bg-color);
@@ -206,6 +265,12 @@ const showInferred = ref(false);
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.demo-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .demo-header__logo {
@@ -229,6 +294,26 @@ const showInferred = ref(false);
   margin: 2px 0 0;
   font-size: 13px;
   color: var(--el-text-color-secondary);
+}
+
+.demo-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--el-border-color);
+  border-radius: 9px;
+  background: var(--el-bg-color);
+  color: var(--el-text-color-regular);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.demo-lang-btn:hover {
+  border-color: var(--el-color-primary);
+  color: var(--el-color-primary);
 }
 
 .demo-icon-btn {
@@ -288,16 +373,6 @@ const showInferred = ref(false);
   color: var(--el-color-primary);
 }
 
-.demo-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-.demo-grid .demo-section {
-  margin-bottom: 40px;
-}
-
 .demo-actions {
   display: flex;
   flex-wrap: wrap;
@@ -346,11 +421,5 @@ const showInferred = ref(false);
 
 .demo-validate-inline {
   margin-top: 16px;
-}
-
-@media (max-width: 768px) {
-  .demo-grid {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

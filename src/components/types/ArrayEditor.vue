@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { ElInputNumber } from "element-plus/es/components/input-number/index";
-import "element-plus/es/components/input-number/style/css";
-import { ElSwitch } from "element-plus/es/components/switch/index";
-import "element-plus/es/components/switch/style/css";
+import { ElInputNumber, ElSwitch } from "element-plus";
 import { computed, ref } from "vue";
-import { zh as t } from "../../constants/zh.ts";
 import { getArrayItemsSchema } from "../../lib/schema-editor.ts";
 import { normalizeSchemaType } from "../../lib/schema-types.ts";
 import type {
@@ -31,6 +27,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   change: [schema: ObjectJSONSchema];
 }>();
+
+import { t } from "../../composables/useI18n.ts";
 
 const minItems = ref<number | null>(
   withObjectSchema(props.schema, (schema) => schema.minItems ?? null, null),

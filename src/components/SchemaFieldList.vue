@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { t } from "../composables/useI18n.ts";
 import { useSchemaStore } from "../composables/useSchemaStore.ts";
-import { zh } from "../constants/zh.ts";
 import { getSchemaProperties } from "../lib/schema-editor.ts";
 import type { JSONSchema } from "../types/json-schema.ts";
 import { buildValidationTree } from "../types/validation.ts";
@@ -16,7 +16,6 @@ const props = withDefaults(
 );
 
 const store = useSchemaStore();
-const t = zh;
 
 const parentSchema = computed<JSONSchema>(() => {
   if (props.path.length === 0) return store.schema.value;
@@ -28,7 +27,7 @@ const parentSchema = computed<JSONSchema>(() => {
 const properties = computed(() => getSchemaProperties(parentSchema.value));
 
 const validationTree = computed(() =>
-  buildValidationTree(parentSchema.value, t),
+  buildValidationTree(parentSchema.value, t.value),
 );
 </script>
 

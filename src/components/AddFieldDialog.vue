@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import { CirclePlus, HelpCircle, Info } from "@lucide/vue";
-import { ElButton } from "element-plus/es/components/button/index";
-import "element-plus/es/components/button/style/css";
-import { ElDialog } from "element-plus/es/components/dialog/index";
-import "element-plus/es/components/dialog/style/css";
-import { ElInput } from "element-plus/es/components/input/index";
-import "element-plus/es/components/input/style/css";
-import { ElSwitch } from "element-plus/es/components/switch/index";
-import "element-plus/es/components/switch/style/css";
-import { ElTag } from "element-plus/es/components/tag/index";
-import "element-plus/es/components/tag/style/css";
-import { ElTooltip } from "element-plus/es/components/tooltip/index";
-import "element-plus/es/components/tooltip/style/css";
+import {
+  ElButton,
+  ElDialog,
+  ElInput,
+  ElSwitch,
+  ElTag,
+  ElTooltip,
+} from "element-plus";
 import { computed, ref } from "vue";
+import { t } from "../composables/useI18n.ts";
 import { useSchemaStore } from "../composables/useSchemaStore.ts";
-import { zh as t } from "../constants/zh.ts";
 import type { SchemaType } from "../types/json-schema.ts";
 import SchemaTypeSelector from "./SchemaTypeSelector.vue";
 
@@ -27,6 +23,7 @@ const props = withDefaults(
 );
 
 const store = useSchemaStore();
+
 const buttonType = computed<"" | "primary">(() =>
   props.variant === "primary" ? "primary" : "",
 );
@@ -64,12 +61,8 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <el-button
-    :type="buttonType"
-    size="small"
-    @click="dialogOpen = true"
-  >
-    <CirclePlus :size="16" />
+  <el-button :type="buttonType" size="small" @click="dialogOpen = true"
+    ><template #icon> <CirclePlus :size="14" /></template>
     <span>{{ t.fieldAddNewButton }}</span>
   </el-button>
 
@@ -129,7 +122,10 @@ const handleSubmit = () => {
           <div v-if="fieldType === 'object'" class="schema-form__option">
             <el-switch v-model="additionalProperties" />
             <label>{{ t.additionalPropertiesAllow }}</label>
-            <el-tooltip :content="t.additionalPropertiesTooltip" placement="top">
+            <el-tooltip
+              :content="t.additionalPropertiesTooltip"
+              placement="top"
+            >
               <Info :size="16" class="schema-field-label__icon" />
             </el-tooltip>
           </div>
@@ -152,15 +148,21 @@ const handleSubmit = () => {
               <template v-if="fieldType === 'string'">"example"</template>
               <template v-else-if="fieldType === 'number'">42</template>
               <template v-else-if="fieldType === 'boolean'">true</template>
-              <template v-else-if="fieldType === 'object'">{ "key": "value" }</template>
-              <template v-else-if="fieldType === 'array'">["item1", "item2"]</template>
+              <template v-else-if="fieldType === 'object'"
+                >{ "key": "value" }</template
+              >
+              <template v-else-if="fieldType === 'array'"
+                >["item1", "item2"]</template
+              >
             </code>
           </div>
         </div>
       </div>
 
       <div class="schema-form__actions">
-        <el-button @click="dialogOpen = false">{{ t.fieldAddNewCancel }}</el-button>
+        <el-button @click="dialogOpen = false">{{
+          t.fieldAddNewCancel
+        }}</el-button>
         <el-button type="primary" native-type="submit">
           {{ t.fieldAddNewConfirm }}
         </el-button>

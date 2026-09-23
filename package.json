@@ -11,7 +11,7 @@
     "vue"
   ],
   "private": false,
-  "version": "0.5.1",
+  "version": "0.0.5",
   "type": "module",
   "sideEffects": [
     "*.css"
@@ -41,6 +41,8 @@
     "check": "biome check .",
     "fix": "biome check --fix --unsafe",
     "typecheck": "vue-tsc --noEmit -p src/tsconfig.typecheck.json && vue-tsc --noEmit -p example/tsconfig.typecheck.json",
+    "publish:npm": "pnpm publish --access public --no-git-checks",
+    "release": "pnpm run typecheck && pnpm version patch && pnpm run publish:npm && git push --follow-tags",
     "prepack": "pnpm run build"
   },
   "dependencies": {

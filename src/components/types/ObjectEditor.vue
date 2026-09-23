@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import { ElButton } from "element-plus/es/components/button/index";
-import "element-plus/es/components/button/style/css";
-import { ElEmpty } from "element-plus/es/components/empty/index";
-import "element-plus/es/components/empty/style/css";
+import { ElButton, ElEmpty } from "element-plus";
 import { computed } from "vue";
 import { useSchemaStore } from "../../composables/useSchemaStore.ts";
-import { zh as t } from "../../constants/zh.ts";
 import { getSchemaProperties } from "../../lib/schema-editor.ts";
 import type { JSONSchema } from "../../types/json-schema.ts";
 import { isBooleanSchema } from "../../types/json-schema.ts";
@@ -25,6 +21,9 @@ const props = withDefaults(
 );
 
 const store = useSchemaStore();
+
+import { t } from "../../composables/useI18n.ts";
+
 const properties = computed(() => getSchemaProperties(props.schema));
 const isAdditionalPropertiesForbidden = computed(
   () =>

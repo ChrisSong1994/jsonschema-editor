@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { ElButton } from "element-plus/es/components/button/index";
-import "element-plus/es/components/button/style/css";
-import { ElInput } from "element-plus/es/components/input/index";
-import "element-plus/es/components/input/style/css";
-import { ElInputNumber } from "element-plus/es/components/input-number/index";
-import "element-plus/es/components/input-number/style/css";
-import { ElOption, ElSelect } from "element-plus/es/components/select/index";
-import "element-plus/es/components/select/style/css";
-import { ElTag } from "element-plus/es/components/tag/index";
-import "element-plus/es/components/tag/style/css";
+import {
+  ElButton,
+  ElInput,
+  ElInputNumber,
+  ElOption,
+  ElSelect,
+  ElTag,
+} from "element-plus";
 import { computed, ref } from "vue";
-import { zh as t } from "../../constants/zh.ts";
 import type { JSONSchema, ObjectJSONSchema } from "../../types/json-schema.ts";
 import { isBooleanSchema, withObjectSchema } from "../../types/json-schema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
@@ -31,6 +28,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   change: [schema: ObjectJSONSchema];
 }>();
+
+import { t } from "../../composables/useI18n.ts";
 
 const enumValue = ref("");
 
@@ -95,16 +94,16 @@ const patternError = computed(() => findError("pattern"));
 const formatError = computed(() => findError("format"));
 
 const formatOptions = computed(() => [
-  { label: t.stringFormatNone, value: "none" },
-  { label: t.stringFormatDateTime, value: "date-time" },
-  { label: t.stringFormatDate, value: "date" },
-  { label: t.stringFormatTime, value: "time" },
-  { label: t.stringFormatEmail, value: "email" },
-  { label: t.stringFormatUri, value: "uri" },
-  { label: t.stringFormatUuid, value: "uuid" },
-  { label: t.stringFormatHostname, value: "hostname" },
-  { label: t.stringFormatIpv4, value: "ipv4" },
-  { label: t.stringFormatIpv6, value: "ipv6" },
+  { label: t.value.stringFormatNone, value: "none" },
+  { label: t.value.stringFormatDateTime, value: "date-time" },
+  { label: t.value.stringFormatDate, value: "date" },
+  { label: t.value.stringFormatTime, value: "time" },
+  { label: t.value.stringFormatEmail, value: "email" },
+  { label: t.value.stringFormatUri, value: "uri" },
+  { label: t.value.stringFormatUuid, value: "uuid" },
+  { label: t.value.stringFormatHostname, value: "hostname" },
+  { label: t.value.stringFormatIpv4, value: "ipv4" },
+  { label: t.value.stringFormatIpv6, value: "ipv6" },
 ]);
 
 const needsDetail = computed(

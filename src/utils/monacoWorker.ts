@@ -18,7 +18,9 @@ export function initMonacoWorker() {
   initialized = true;
   (
     self as unknown as {
-      MonacoEnvironment: { getWorker: (workerId: string, label: string) => unknown };
+      MonacoEnvironment: {
+        getWorker: (workerId: string, label: string) => unknown;
+      };
     }
   ).MonacoEnvironment = {
     getWorker(_: string, label: string) {

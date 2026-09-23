@@ -1,14 +1,8 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronRight, X } from "@lucide/vue";
-import { ElButton } from "element-plus/es/components/button/index";
-import "element-plus/es/components/button/style/css";
-import { ElInput } from "element-plus/es/components/input/index";
-import "element-plus/es/components/input/style/css";
-import { ElTag } from "element-plus/es/components/tag/index";
-import "element-plus/es/components/tag/style/css";
+import { ElButton, ElInput, ElTag } from "element-plus";
 import { computed, ref } from "vue";
 import { useSchemaStore } from "../composables/useSchemaStore.ts";
-import { zh as t } from "../constants/zh.ts";
 import { normalizeSchemaType } from "../lib/schema-types.ts";
 import type {
   JSONSchema,
@@ -37,6 +31,9 @@ const props = withDefaults(
 );
 
 const store = useSchemaStore();
+
+import { t } from "../composables/useI18n.ts";
+
 const expanded = ref(false);
 const isEditingName = ref(false);
 const isEditingDesc = ref(false);

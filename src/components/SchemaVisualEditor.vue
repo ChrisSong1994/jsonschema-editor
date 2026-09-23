@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { ElEmpty } from "element-plus/es/components/empty/index";
-import "element-plus/es/components/empty/style/css";
+import { ElEmpty } from "element-plus";
 import { computed } from "vue";
 import { useSchemaStore } from "../composables/useSchemaStore.ts";
-import { zh as t } from "../constants/zh.ts";
 import { isBooleanSchema, isObjectSchema } from "../types/json-schema.ts";
 import AddFieldDialog from "./AddFieldDialog.vue";
 import SchemaFieldList from "./SchemaFieldList.vue";
@@ -14,6 +12,8 @@ withDefaults(
   }>(),
   { readOnly: false },
 );
+
+import { t } from "../composables/useI18n.ts";
 
 const store = useSchemaStore();
 const schema = computed(() => store.schema.value);

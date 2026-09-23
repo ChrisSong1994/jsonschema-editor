@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { ElOption, ElSelect } from "element-plus/es/components/select/index";
-import "element-plus/es/components/select/style/css";
-import { ElTag } from "element-plus/es/components/tag/index";
-import "element-plus/es/components/tag/style/css";
+import { ElOption, ElSelect, ElTag } from "element-plus";
 import { computed } from "vue";
 import {
   getSchemaTypeClass,
@@ -64,6 +61,9 @@ const options = computed(() =>
         {{ option.label }}
       </el-tag>
     </el-option>
+    <template #label>
+      <span class="schema-type-select__empty-label" />
+    </template>
     <template #prefix>
       <el-tag
         size="small"

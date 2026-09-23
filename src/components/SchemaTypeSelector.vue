@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { zh as t } from "../constants/zh.ts";
+import type { LocaleMessages } from "../composables/useI18n.ts";
 import type { SchemaType } from "../types/json-schema.ts";
 
 interface TypeOption {
   id: SchemaType;
-  label: keyof typeof t;
-  description: keyof typeof t;
+  label: keyof LocaleMessages;
+  description: keyof LocaleMessages;
 }
 
 const typeOptions: TypeOption[] = [
@@ -44,6 +44,8 @@ defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [value: SchemaType];
 }>();
+
+import { t } from "../composables/useI18n.ts";
 </script>
 
 <template>

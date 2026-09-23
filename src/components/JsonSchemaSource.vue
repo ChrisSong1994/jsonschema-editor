@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { Download, FileJson } from "@lucide/vue";
-import { ElButton } from "element-plus/es/components/button/index";
-import "element-plus/es/components/button/style/css";
-import { ElTooltip } from "element-plus/es/components/tooltip/index";
-import "element-plus/es/components/tooltip/style/css";
+import { ElButton, ElTooltip } from "element-plus";
 import { computed, ref, watch } from "vue";
-import JsonEditor from "@/components/UI/Editors/JsonEditor/index.vue";
 import { useSchemaStore } from "../composables/useSchemaStore.ts";
-import { zh as t } from "../constants/zh.ts";
+import JsonEditor from "./JsonEditor.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -17,6 +13,9 @@ const props = withDefaults(
 );
 
 const store = useSchemaStore();
+
+import { t } from "../composables/useI18n.ts";
+
 const schema = computed(() => store.schema.value);
 
 let lastStoreJson = JSON.stringify(schema.value);
@@ -52,7 +51,7 @@ const handleDownload = () => {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = t.visualizerDownloadFileName;
+  anchor.download = t.value.visualizerDownloadFileName;
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);

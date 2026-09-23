@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { ElSwitch } from "element-plus/es/components/switch/index";
-import "element-plus/es/components/switch/style/css";
+import { ElSwitch } from "element-plus";
 import { computed } from "vue";
-import { zh as t } from "../../constants/zh.ts";
 import type { JSONSchema, ObjectJSONSchema } from "../../types/json-schema.ts";
 import { withObjectSchema } from "../../types/json-schema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
@@ -21,6 +19,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   change: [schema: ObjectJSONSchema];
 }>();
+
+import { t } from "../../composables/useI18n.ts";
 
 const enumValues = computed(() =>
   withObjectSchema(

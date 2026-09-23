@@ -1,12 +1,6 @@
 <script setup lang="ts">
-import { ElButton } from "element-plus/es/components/button/index";
-import "element-plus/es/components/button/style/css";
-import { ElInputNumber } from "element-plus/es/components/input-number/index";
-import "element-plus/es/components/input-number/style/css";
-import { ElTag } from "element-plus/es/components/tag/index";
-import "element-plus/es/components/tag/style/css";
+import { ElButton, ElInputNumber, ElTag } from "element-plus";
 import { computed, ref } from "vue";
-import { zh as t } from "../../constants/zh.ts";
 import type { JSONSchema, ObjectJSONSchema } from "../../types/json-schema.ts";
 import { isBooleanSchema, withObjectSchema } from "../../types/json-schema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
@@ -34,6 +28,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   change: [schema: ObjectJSONSchema];
 }>();
+
+import { t } from "../../composables/useI18n.ts";
 
 const enumValue = ref<number | null>(null);
 

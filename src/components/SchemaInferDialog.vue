@@ -1,22 +1,20 @@
 <script setup lang="ts">
 import { Loader2 } from "@lucide/vue";
-import { ElButton } from "element-plus/es/components/button/index";
-import "element-plus/es/components/button/style/css";
-import { ElDialog } from "element-plus/es/components/dialog/index";
-import "element-plus/es/components/dialog/style/css";
+import { ElButton, ElDialog } from "element-plus";
 import { computed, ref, watch } from "vue";
-import JsonEditor from "@/components/UI/Editors/JsonEditor/index.vue";
-import { zh as t } from "../constants/zh.ts";
 import { createSchemaFromJson } from "../lib/schema-inference.ts";
 import type { JSONSchema } from "../types/json-schema.ts";
+import JsonEditor from "./JsonEditor.vue";
 
 const props = withDefaults(
   defineProps<{
-    /** 传入 visible 时以弹窗形式展示，否则以内联形式展示。 */
+    /** 传入 visible 时以弹窗形式展示，否则以内联形式。 */
     visible?: boolean;
   }>(),
   { visible: undefined },
 );
+
+import { t } from "../composables/useI18n.ts";
 
 const emit = defineEmits<{
   "update:visible": [value: boolean];
@@ -62,7 +60,7 @@ const handleInfer = () => {
     if (isDialog.value) emit("update:visible", false);
   } catch (error) {
     errorMessage.value =
-      error instanceof Error ? error.message : "无效的 JSON 格式";
+      error instanceof Error ? error.message : t.value.inferrerErrorInvalidJson;
   } finally {
     isProcessing.value = false;
   }
